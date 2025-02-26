@@ -1,0 +1,17 @@
+name: SlimefunCoreProtect
+author: balugaq
+description: This is a Slimefun addon.
+main: com.balugaq.slimefuncoreprotect.implementation.SlimefunCoreProtect
+website: https://github.com/balugaq/SlimefunCoreProtect
+version: ${project.version}
+api-version: 1.17
+depend:
+  - Slimefun
+softdepend:
+  - GuizhanLibPlugin
+commands:
+  slimefuncoreprotect:
+    aliases:
+      - sco
+    description: /slimefuncoreprotect
+    usage: /slimefuncoreprotect <sub>
