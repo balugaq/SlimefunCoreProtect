@@ -3,6 +3,7 @@ package com.balugaq.slimefuncoreprotect.core.managers;
 import com.balugaq.slimefuncoreprotect.api.utils.Lang;
 import com.balugaq.slimefuncoreprotect.core.commands.SubCommand;
 import com.balugaq.slimefuncoreprotect.core.commands.subcommands.HelpCommand;
+import com.balugaq.slimefuncoreprotect.core.commands.subcommands.LookupCommand;
 import com.balugaq.slimefuncoreprotect.core.commands.subcommands.ReloadCommand;
 import com.balugaq.slimefuncoreprotect.core.commands.subcommands.VersionCommand;
 import com.google.common.base.Preconditions;
@@ -37,6 +38,7 @@ public class CommandManager implements TabExecutor {
         subCommands.add(new HelpCommand(plugin));
         subCommands.add(new ReloadCommand(plugin));
         subCommands.add(new VersionCommand(plugin));
+        subCommands.add(new LookupCommand(plugin));
     }
 
     public void registerCommand() {

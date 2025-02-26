@@ -2,10 +2,25 @@
 # Auto update or not.
 auto-update: true
 # Build station to use.
-build-station: "Guizhan" # Expected "Guizhan" or "Blob"
+build-station: "Guizhan" # Expected "Guizhan" / "Blob"
 
 # Do not change this value unless you know what you are doing.
-config-version: C_20250224_1
+config-version: C_20250226_2
 
 # Do not change this value unless you know what you are doing.
 debug: false
+
+database:
+  type: sqlite # Expected sqlite / mysql
+
+  mysql:
+    host: 127.0.0.1
+    port: 3306
+    database: ""
+    user: ""
+    password: ""
+    useSSL: false
+    timezone: Shanghai
+    maxConnection: 10
+  sqlite:
+    maxConnection: 10

@@ -1,5 +1,6 @@
 package com.balugaq.slimefuncoreprotect.core.managers;
 
+import com.balugaq.slimefuncoreprotect.core.listeners.BlockListener;
 import com.balugaq.slimefuncoreprotect.implementation.SlimefunCoreProtect;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -22,7 +23,7 @@ public class ListenerManager {
     }
 
     public void setup() {
-        // todo:
+        listeners.add(new BlockListener());
     }
 
     public void load() {

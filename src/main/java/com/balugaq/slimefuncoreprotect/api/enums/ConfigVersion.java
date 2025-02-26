@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 public enum ConfigVersion {
     C_UNKNOWN,
     C_20250226_1,
+    C_20250226_2,
     ;
 
     ConfigVersion() {

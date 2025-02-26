@@ -3,12 +3,14 @@ package com.balugaq.slimefuncoreprotect.core.managers;
 import com.balugaq.slimefuncoreprotect.api.annotations.Since;
 import com.balugaq.slimefuncoreprotect.api.enums.BuildStation;
 import com.balugaq.slimefuncoreprotect.api.enums.ConfigVersion;
+import com.balugaq.slimefuncoreprotect.api.enums.DatabaseType;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.File;
@@ -23,7 +25,6 @@ public class ConfigManager {
     private static final @NotNull String CONFIG_PATH = "config.yml";
     private static final @NotNull String BANS_PATH = "accelerates.yml";
     private final @NotNull FileConfiguration config;
-    private final @NotNull FileConfiguration bans;
     @Since(ConfigVersion.C_20250226_1)
     private final boolean AUTO_UPDATE;
     @Since(ConfigVersion.C_20250226_1)
@@ -35,11 +36,12 @@ public class ConfigManager {
     private BuildStation BUILD_STATION;
     @Since(ConfigVersion.C_20250226_1)
     private ConfigVersion CONFIG_VERSION;
+    @Since(ConfigVersion.C_20250226_2)
+    private DatabaseType DATABASE_TYPE;
 
     public ConfigManager(@NotNull JavaPlugin plugin) {
         this.plugin = plugin;
         this.config = YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder(), CONFIG_PATH));
-        this.bans = YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder(), BANS_PATH));
         setupDefaultConfig();
         try {
             this.CONFIG_VERSION = ConfigVersion.valueOf(plugin.getConfig().getString("config-version", "UNKNOWN").toUpperCase());
@@ -57,6 +59,14 @@ public class ConfigManager {
             this.BUILD_STATION = BuildStation.GUIZHAN;
         }
         this.LANGUAGE = config.getString("language", "zh-CN");
+
+        String dataBaseTypeStr = config.getString("database.type", "sqlite");
+        try {
+            this.DATABASE_TYPE = DatabaseType.valueOf(dataBaseTypeStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            plugin.getLogger().warning("Invalid database.type value: " + dataBaseTypeStr + ", using default value: sqlite");
+            this.DATABASE_TYPE = DatabaseType.SQLITE;
+        }
     }
 
     private void setupDefaultConfig() {
@@ -139,5 +149,13 @@ public class ConfigManager {
 
     public ConfigVersion getConfigVersion() {
         return CONFIG_VERSION;
+    }
+
+    public DatabaseType getDatabaseType() {
+        return DATABASE_TYPE;
+    }
+
+    public @Nullable String getConfig(@NotNull String path) {
+        return config.getString(path);
     }
 }
