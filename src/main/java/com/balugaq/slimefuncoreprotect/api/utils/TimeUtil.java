@@ -1,4 +1,4 @@
-package com.balugaq.slimefuncoreprotect.api;
+package com.balugaq.slimefuncoreprotect.api.utils;
 
 import lombok.experimental.UtilityClass;
 

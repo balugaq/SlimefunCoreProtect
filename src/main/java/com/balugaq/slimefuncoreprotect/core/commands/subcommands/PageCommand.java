@@ -1,10 +1,9 @@
 package com.balugaq.slimefuncoreprotect.core.commands.subcommands;
 
-import com.balugaq.slimefuncoreprotect.api.LogEntry;
+import com.balugaq.slimefuncoreprotect.api.logs.LogEntry;
 import com.balugaq.slimefuncoreprotect.api.utils.Lang;
 import com.balugaq.slimefuncoreprotect.core.commands.SubCommand;
 import com.balugaq.slimefuncoreprotect.core.managers.CommandManager;
-import com.balugaq.slimefuncoreprotect.implementation.SlimefunCoreProtect;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;

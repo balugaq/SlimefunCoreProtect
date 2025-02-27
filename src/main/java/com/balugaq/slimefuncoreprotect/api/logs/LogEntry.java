@@ -1,4 +1,4 @@
-package com.balugaq.slimefuncoreprotect.api;
+package com.balugaq.slimefuncoreprotect.api.logs;
 
 import com.balugaq.slimefuncoreprotect.api.utils.Debug;
 import lombok.Data;

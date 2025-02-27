@@ -1,10 +1,12 @@
 package com.balugaq.slimefuncoreprotect.core.commands.subcommands;
 
-import com.balugaq.slimefuncoreprotect.api.LogDao;
-import com.balugaq.slimefuncoreprotect.api.LogEntry;
+import com.balugaq.slimefuncoreprotect.api.enums.Action;
+import com.balugaq.slimefuncoreprotect.api.logs.BlockLogDao;
+import com.balugaq.slimefuncoreprotect.api.logs.LogEntry;
 import com.balugaq.slimefuncoreprotect.api.utils.Debug;
 import com.balugaq.slimefuncoreprotect.core.commands.SubCommand;
 import com.balugaq.slimefuncoreprotect.core.managers.CommandManager;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -63,7 +65,7 @@ public class LookupCommand extends SubCommand {
             }
         }
 
-        List<LogEntry> entries = LogDao.getLogs(commandArgs);
+        List<LogEntry> entries = BlockLogDao.getLogs(commandArgs);
         if (entries.isEmpty()) {
             sender.sendMessage("No entries found.");
             return true;
@@ -92,15 +94,25 @@ public class LookupCommand extends SubCommand {
         List<LogEntry> splitted = CommandManager.splitEntries(entries, currentPage);
         for (LogEntry entry : splitted) {
             Location location = entry.getLocation();
+            String delay = getDelay(entry.getTime());
+            String spaces = " ".repeat(delay.length() + 3);
             sender.spigot().sendMessage(CommandManager.formatMessage(
-                    "&b" + getDelay(entry.getTime()) +
-                            "&7 - <hover><d>&b" + entry.getPlayer() + "</d><h>&b点击复制: " + entry.getPlayer() + "</h></hover>" +
+                    "&e" + delay +
+                            "&7 * <hover><d>&b" + entry.getPlayer() + "</d><h>&d点击复制: " + entry.getPlayer() + "</h></hover>" +
                             "<click><a>copy_to_clipboard</a><v>" + entry.getPlayer() + "</v></click>" +
-                            "&7 - &b" + entry.getAction() + "<hover><d>&b" + entry.getAction() + "</d><h>&b点击复制: " + entry.getAction() + "</h></hover>" +
-                            "<click><a>copy_to_clipboard</a><v>" + entry.getAction() + "</v></click>" +
-                            "&7 - <hover><d>&b" + LogEntry.getStringBlockLocation(location) + "</d><h>&b点击传送到该位置</h></hover>" +
-                            "<click>=<a>run_command</a><v>/minecraft:tp " + location.getBlockX() + " " + location.getBlockY() + " " + location.getBlockZ() + "</v></click>" +
-                            "&7 - <hover><d>&b粘液 ID: " + entry.getSlimefunId() + "</d><h>&b点击复制: " + entry.getSlimefunId() + "</h></hover>" +
+                            "&7 * <hover><d>&f" + humanizeAction(entry.getAction()) + "</d><h>&d点击复制: " + humanizeAction(entry.getAction()) + "</h></hover>" +
+                            "<click><a>copy_to_clipboard</a><v>" + humanizeAction(entry.getAction()) + "</v></click>"
+            ));
+
+            newline();
+            sender.spigot().sendMessage(CommandManager.formatMessage(
+                            "&7 * <hover><d>" + spaces + "&7&o(x" + location.getBlockX() + "/y" + location.getBlockY() + "/z" + location.getBlockZ() + "/" + location.getWorld().getName() + ")" + "</d><h>&b点击传送到该位置</h></hover>" +
+                            "<click>=<a>run_command</a><v>/minecraft:tp " + location.getBlockX() + " " + location.getBlockY() + " " + location.getBlockZ() + "</v></click>"
+            ));
+
+            newline();
+            sender.spigot().sendMessage(CommandManager.formatMessage(
+                            "&7 * <hover><d>" + spaces + "&a&o物品: " + getName(entry.getSlimefunId()) + "</d><h>&d点击复制: " + entry.getSlimefunId() + "</h></hover>" +
                             "<click><a>copy_to_clipboard</a><v>" + entry.getSlimefunId() + "</v></click>"
             ));
         }
@@ -123,5 +135,58 @@ public class LookupCommand extends SubCommand {
         }
         // if more than 1 day, show days with dot
         return String.format("%.2fd", delay / 86400.0D);
+    }
+
+    // the opposite of getDelay()
+    public static Timestamp parseTime(String timeStr) {
+        if (timeStr.endsWith("s")) {
+            double seconds = Double.parseDouble(timeStr.replace("s", ""));
+            return new Timestamp(System.currentTimeMillis() - (long) (seconds * 1000));
+        } else if (timeStr.endsWith("m")) {
+            double minutes = Double.parseDouble(timeStr.replace("m", ""));
+            return new Timestamp(System.currentTimeMillis() - (long) (minutes * 60 * 1000));
+        } else if (timeStr.endsWith("h")) {
+            double hours = Double.parseDouble(timeStr.replace("h", ""));
+            return new Timestamp(System.currentTimeMillis() - (long) (hours * 3600 * 1000));
+        } else if (timeStr.endsWith("d")) {
+            double days = Double.parseDouble(timeStr.replace("d", ""));
+            return new Timestamp(System.currentTimeMillis() - (long) (days * 86400 * 1000));
+        } else {
+            return null;
+        }
+    }
+
+    // A empty method, just notice the reader
+    public static void newline() {
+    }
+
+    public static String humanizeAction(String actionStr) {
+        Action action = Action.valueOf(actionStr.toUpperCase());
+        return switch (action) {
+            case BLOCK_PLACE -> "&a&l+block&r";
+            case BLOCK_BREAK -> "&c&l-block&r";
+            case MENU_OPEN -> "&a&l+menu&r";
+            case MENU_CLOSE -> "&c&l-menu&r";
+            default -> "&7" + action.toString().toLowerCase();
+        };
+    }
+
+    public static Action unhumanizeAction(String actionStr) {
+        return switch (actionStr.toLowerCase()) {
+            case "+block" -> Action.BLOCK_PLACE;
+            case "-block" -> Action.BLOCK_BREAK;
+            case "+menu" -> Action.MENU_OPEN;
+            case "-menu" -> Action.MENU_CLOSE;
+            default -> Action.valueOf(actionStr.toUpperCase());
+        };
+    }
+
+    public static String getName(String slimefunId) {
+        SlimefunItem slimefunItem = SlimefunItem.getById(slimefunId);
+        if (slimefunItem == null) {
+            return slimefunId;
+        }
+
+        return slimefunItem.getItemName();
     }
 }

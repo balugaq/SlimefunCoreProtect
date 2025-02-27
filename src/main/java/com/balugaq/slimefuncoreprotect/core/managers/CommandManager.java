@@ -1,9 +1,9 @@
 package com.balugaq.slimefuncoreprotect.core.managers;
 
-import com.balugaq.slimefuncoreprotect.api.LogEntry;
-import com.balugaq.slimefuncoreprotect.api.utils.Debug;
+import com.balugaq.slimefuncoreprotect.api.logs.LogEntry;
 import com.balugaq.slimefuncoreprotect.api.utils.Lang;
 import com.balugaq.slimefuncoreprotect.core.commands.SubCommand;
+import com.balugaq.slimefuncoreprotect.core.commands.subcommands.DeleteCommand;
 import com.balugaq.slimefuncoreprotect.core.commands.subcommands.HelpCommand;
 import com.balugaq.slimefuncoreprotect.core.commands.subcommands.LookupCommand;
 import com.balugaq.slimefuncoreprotect.core.commands.subcommands.PageCommand;
@@ -17,6 +17,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -59,6 +60,7 @@ public class CommandManager implements TabExecutor {
         subCommands.add(new VersionCommand(plugin));
         subCommands.add(new LookupCommand(plugin));
         subCommands.add(new PageCommand(plugin));
+        subCommands.add(new DeleteCommand(plugin));
     }
 
     public void registerCommand() {
@@ -80,7 +82,9 @@ public class CommandManager implements TabExecutor {
 
         for (SubCommand subCommand : subCommands) {
             if (subCommand.canCommand(sender, command, label, args)) {
-                subCommand.onCommand(sender, command, label, args);
+                Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                    subCommand.onCommand(sender, command, label, args);
+                });
                 return true;
             }
         }
@@ -106,7 +110,7 @@ public class CommandManager implements TabExecutor {
         return completions;
     }
 
-    private static final int maxContentPerPage = 10;
+    private static final int maxContentPerPage = 5; // todo: add to config
     public static @NotNull List<LogEntry> splitEntries(@NotNull List<LogEntry> entries, int page) {
         if (entries.isEmpty()) {
             return entries;

@@ -1,7 +1,6 @@
 package com.balugaq.slimefuncoreprotect.implementation;
 
-import com.balugaq.slimefuncoreprotect.api.DatabaseManager;
-import com.balugaq.slimefuncoreprotect.api.LogDao;
+import com.balugaq.slimefuncoreprotect.api.logs.BlockDatabaseManager;
 import com.balugaq.slimefuncoreprotect.api.utils.Lang;
 import com.balugaq.slimefuncoreprotect.core.managers.CommandManager;
 import com.balugaq.slimefuncoreprotect.core.managers.ConfigManager;
@@ -15,9 +14,6 @@ import net.guizhanss.guizhanlibplugin.updater.GuizhanUpdater;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.sql.Timestamp;
-import java.time.Instant;
 
 @Getter
 public class SlimefunCoreProtect extends JavaPlugin implements SlimefunAddon {
@@ -121,7 +117,7 @@ public class SlimefunCoreProtect extends JavaPlugin implements SlimefunAddon {
         getLogger().info("Disabling SlimefunCoreProtect...");
         getLogger().info("Unloading listeners...");
         getListenerManager().unload();
-        DatabaseManager.shutdown();
+        BlockDatabaseManager.shutdown();
         getLogger().info("SlimefunCoreProtect disabled.");
     }
 
