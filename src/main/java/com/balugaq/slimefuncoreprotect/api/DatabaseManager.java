@@ -10,7 +10,6 @@ import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -104,8 +103,8 @@ public class DatabaseManager {
         }
     }
 
-    public static void insertLog(LogEntry logEntry) {
-        insertLog(logEntry.getUser(), logEntry.getTime(), logEntry.getAction(), logEntry.getLocation());
+    public static void insertLog(@NotNull LogEntry logEntry) {
+        insertLog(logEntry.getPlayer(), logEntry.getTime(), logEntry.getAction(), logEntry.getLocation());
     }
 
     public static void insertLog(String user, Timestamp timestamp, String action, @NotNull Location location) {
@@ -146,7 +145,7 @@ public class DatabaseManager {
         }
         Timestamp timestamp = null;
         try {
-            timestamp = Timestamp.valueOf(time);
+            timestamp = Timestamp.valueOf(time); // yyyy-[M]M-[d]d hh:mm:ss
         } catch (IllegalArgumentException e) {
             Debug.log("Invalid timestamp: " + time);
             return;

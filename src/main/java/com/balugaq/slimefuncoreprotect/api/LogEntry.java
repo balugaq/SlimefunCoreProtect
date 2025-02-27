@@ -15,7 +15,7 @@ import java.sql.Timestamp;
 public class LogEntry {
     private static int BIT_MASK_ROLLBACKED = 1; // underline the message if it was rolled back
     private int id;
-    private String user;
+    private String player;
     private Timestamp time;
     private String action;
     private Location location;
