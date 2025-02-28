@@ -1,12 +1,8 @@
 package com.balugaq.slimefuncoreprotect.core.commands.subcommands;
 
-import com.balugaq.slimefuncoreprotect.api.logs.LogDao;
-import com.balugaq.slimefuncoreprotect.api.logs.LogEntry;
 import com.balugaq.slimefuncoreprotect.api.utils.Lang;
 import com.balugaq.slimefuncoreprotect.core.commands.PlayerOnlyCommand;
-import com.balugaq.slimefuncoreprotect.core.commands.SubCommand;
 import com.balugaq.slimefuncoreprotect.core.listeners.InspectListener;
-import com.balugaq.slimefuncoreprotect.core.managers.CommandManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -15,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 public class InspectCommand extends PlayerOnlyCommand {

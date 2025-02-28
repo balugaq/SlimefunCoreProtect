@@ -34,6 +34,7 @@ public class LookupCommand extends SubCommand {
     public static final Set<String> SLIMEFUN_ITEM_IDS = new HashSet<>();
     public static final Set<String> SECTIONS = new HashSet<>();
     public static final Map<String, List<Action>> UNCOMMON_SECTIONS = new HashMap<>();
+
     static {
         SECTIONS.add("action:");
         SECTIONS.add("user:");
@@ -52,50 +53,6 @@ public class LookupCommand extends SubCommand {
 
     public LookupCommand(@NotNull JavaPlugin plugin) {
         super(plugin);
-    }
-
-    @Override
-    public @NotNull String getName() {
-        return "lookup";
-    }
-
-    @Override
-    public boolean canCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
-        if (args.length == 0) {
-            return false;
-        }
-        return getName().equalsIgnoreCase(args[0]);
-    }
-
-    @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
-        Debug.debug("Lookup command executed.");
-        StringBuilder c = new StringBuilder("/sco lookup ");
-        for (String arg : args) {
-            c.append(arg).append(" ");
-        }
-        c = new StringBuilder(c.toString().trim());
-
-        Action action = getAction(args);
-        Map<String, String> commandArgs = getCommandArgs(args);
-
-        List<LogEntry> removes = new ArrayList<>();
-        List<LogEntry> entries = LogDao.getLogs(commandArgs);
-        if (entries.isEmpty()) {
-            sender.sendMessage("No entries found.");
-            return true;
-        }
-
-        if (args.length == 0) {
-            args = new String[] {"radius:10"};
-        }
-
-        handleLookupArgs(args, action, sender, entries, removes);
-        entries.removeAll(removes);
-
-        CommandManager.lookup(sender, entries, c.toString());
-
-        return true;
     }
 
     @Nullable
@@ -172,9 +129,7 @@ public class LookupCommand extends SubCommand {
                                     }
                                 }
                             }
-                        }
-
-                        else if (section.equals("clicked:")) {
+                        } else if (section.equals("clicked:")) {
                             String value = arg.replace(section, "").trim();
                             for (LogEntry entry : entries) {
                                 if (entry.getOtherData() == null) {
@@ -193,9 +148,7 @@ public class LookupCommand extends SubCommand {
                                     continue;
                                 }
                             }
-                        }
-
-                        else if (section.equals("iaction:")) {
+                        } else if (section.equals("iaction:")) {
                             String value = arg.replace(section, "").trim();
                             for (LogEntry entry : entries) {
                                 if (entry.getOtherData() == null) {
@@ -214,9 +167,7 @@ public class LookupCommand extends SubCommand {
                                     continue;
                                 }
                             }
-                        }
-
-                        else if (section.equals("radius:")) {
+                        } else if (section.equals("radius:")) {
                             if (!(sender instanceof Player player)) {
                                 sender.sendMessage("You must be a player to use radius section.");
                                 return false;
@@ -247,7 +198,51 @@ public class LookupCommand extends SubCommand {
     }
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public @NotNull String getName() {
+        return "lookup";
+    }
+
+    @Override
+    public boolean canCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
+        if (args.length == 0) {
+            return false;
+        }
+        return getName().equalsIgnoreCase(args[0]);
+    }
+
+    @Override
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
+        Debug.debug("Lookup command executed.");
+        StringBuilder c = new StringBuilder("/sco lookup ");
+        for (String arg : args) {
+            c.append(arg).append(" ");
+        }
+        c = new StringBuilder(c.toString().trim());
+
+        Action action = getAction(args);
+        Map<String, String> commandArgs = getCommandArgs(args);
+
+        List<LogEntry> removes = new ArrayList<>();
+        List<LogEntry> entries = LogDao.getLogs(commandArgs);
+        if (entries.isEmpty()) {
+            sender.sendMessage("No entries found.");
+            return true;
+        }
+
+        if (args.length == 0) {
+            args = new String[]{"radius:10"};
+        }
+
+        handleLookupArgs(args, action, sender, entries, removes);
+        entries.removeAll(removes);
+
+        CommandManager.lookup(sender, entries, c.toString());
+
+        return true;
+    }
+
+    @Override
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
         Set<String> phase1 = new HashSet<>();
         Set<String> contains = new HashSet<>();
         for (String arg : args) {
@@ -275,7 +270,7 @@ public class LookupCommand extends SubCommand {
         }
 
         Set<String> phase2 = new HashSet<>();
-        String last = args[args.length-1];
+        String last = args[args.length - 1];
         if (last.startsWith("action:")) {
             for (Action action : Action.values()) {
                 String s = "action:" + CommandManager.humanizeAction(action);

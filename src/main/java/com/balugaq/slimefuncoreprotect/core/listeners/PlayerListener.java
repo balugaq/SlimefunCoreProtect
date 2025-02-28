@@ -15,10 +15,16 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class PlayerListener implements Listener {
+    public static String getActionString(@NotNull PlayerInteractEvent event) {
+        return new ActionEntry(event.getAction()).toString();
+    }
+
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerPickupItem(EntityPickupItemEvent event) {
+    public void onPlayerPickupItem(@NotNull EntityPickupItemEvent event) {
         if (event.getEntity() instanceof Player player) {
             SlimefunItem item = SlimefunItem.getByItem(event.getItem().getItemStack());
             if (item != null) {
@@ -35,7 +41,7 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerDropItem(PlayerDropItemEvent event) {
+    public void onPlayerDropItem(@NotNull PlayerDropItemEvent event) {
         SlimefunItem item = SlimefunItem.getByItem(event.getItemDrop().getItemStack());
         if (item != null) {
             Debug.debug("Insert player drop item log");
@@ -51,7 +57,7 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerInteract(PlayerInteractEvent event) {
+    public void onPlayerInteract(@NotNull PlayerInteractEvent event) {
         SlimefunItem item = SlimefunItem.getByItem(event.getItem());
         if (item != null) {
             Debug.debug("Insert player interact item log");
@@ -67,19 +73,12 @@ public class PlayerListener implements Listener {
         }
     }
 
-    public static String getActionString(PlayerInteractEvent event) {
-        return new ActionEntry(event.getAction()).toString();
-    }
-
     @AllArgsConstructor
     @Data
     public static class ActionEntry {
-        private final org.bukkit.event.block.Action action;
-        public String toString() {
-            return "iaction:" + action.name();
-        }
+        private final org.bukkit.event.block.@NotNull Action action;
 
-        public static ActionEntry fromString(String str) {
+        public static @Nullable ActionEntry fromString(@NotNull String str) {
             String[] parts = str.split(":");
             if (parts.length == 2 && parts[0].equals("iaction")) {
                 try {
@@ -89,6 +88,10 @@ public class PlayerListener implements Listener {
                 }
             }
             return null;
+        }
+
+        public @NotNull String toString() {
+            return "iaction:" + action.name();
         }
     }
 }

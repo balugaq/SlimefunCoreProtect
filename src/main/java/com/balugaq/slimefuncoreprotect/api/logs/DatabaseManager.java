@@ -18,6 +18,7 @@ import java.sql.Timestamp;
 public class DatabaseManager {
     @Getter
     public static DataSource dataSource = SourceManager.getDataSource();
+
     private static void createTable() {
         DatabaseType dbType = SlimefunCoreProtect.getInstance().getConfigManager().getDatabaseType();
         String sql = null;
@@ -34,7 +35,7 @@ public class DatabaseManager {
                         status INTEGER DEFAULT 0
                     )
                     """;
-        } else if (dbType == DatabaseType.MYSQL){
+        } else if (dbType == DatabaseType.MYSQL) {
             sql = """
                     CREATE TABLE IF NOT EXISTS user_logs (
                         id INT AUTO_INCREMENT PRIMARY KEY,

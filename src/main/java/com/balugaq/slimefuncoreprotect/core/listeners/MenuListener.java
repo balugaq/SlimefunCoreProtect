@@ -1,6 +1,5 @@
 package com.balugaq.slimefuncoreprotect.core.listeners;
 
-import city.norain.slimefun4.holder.SlimefunInventoryHolder;
 import com.balugaq.slimefuncoreprotect.api.enums.Action;
 import com.balugaq.slimefuncoreprotect.api.logs.LogDao;
 import com.balugaq.slimefuncoreprotect.api.logs.LogEntry;
@@ -23,6 +22,7 @@ import org.bukkit.event.inventory.DragType;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
@@ -31,7 +31,31 @@ import java.util.UUID;
 
 @SuppressWarnings("deprecation")
 public class MenuListener implements Listener {
+    public static final String UNDEFINED = "undefined";
     private static final Set<UUID> opening = new HashSet<>();
+
+    public static String getDragString(@NotNull InventoryDragEvent event) {
+        return new DragEntry(event.getType(), event.getRawSlots(), ItemUtils.getItemName(event.getWhoClicked().getItemOnCursor())).toString();
+    }
+
+    public static @NotNull String getSlotsString(@NotNull Set<Integer> slots) {
+        if (slots.isEmpty()) {
+            return UNDEFINED;
+        }
+        StringBuilder str = new StringBuilder();
+        for (int slot : slots.stream().sorted().toList()) {
+            str.append(slot).append(",");
+        }
+        if (str.charAt(str.length() - 1) == ',') {
+            str = new StringBuilder(str.substring(0, str.length() - 1));
+        }
+        return str.toString();
+    }
+
+    public static String getClickString(@NotNull InventoryClickEvent event) {
+        return new ClickEntry(event.getClick(), event.getAction(), event.getRawSlot(), ItemUtils.getItemName(event.getWhoClicked().getItemOnCursor()), ItemUtils.getItemName(event.getWhoClicked().getItemOnCursor())).toString();
+    }
+
     @EventHandler(priority = EventPriority.MONITOR)
     public void onInit(SlimefunItemRegistryFinalizedEvent event) {
         for (BlockMenuPreset preset : Slimefun.getRegistry().getMenuPresets().values()) {
@@ -57,7 +81,7 @@ public class MenuListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onMenuClick(InventoryClickEvent event) {
+    public void onMenuClick(@NotNull InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
         if (event.getInventory().getHolder() instanceof BlockMenu menu) {
             Debug.debug("Insert menu click log");
@@ -73,7 +97,7 @@ public class MenuListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onMenuDrag(InventoryDragEvent event) {
+    public void onMenuDrag(@NotNull InventoryDragEvent event) {
         Player player = (Player) event.getWhoClicked();
         if (event.getInventory().getHolder() instanceof BlockMenu menu) {
             Debug.debug("Insert menu drag log");
@@ -88,44 +112,17 @@ public class MenuListener implements Listener {
         }
     }
 
-    public static String getDragString(InventoryDragEvent event) {
-        return new DragEntry(event.getType(), event.getRawSlots(), ItemUtils.getItemName(event.getWhoClicked().getItemOnCursor())).toString();
-    }
-
-    public static final String UNDEFINED = "undefined";
-    public static String getSlotsString(Set<Integer> slots) {
-        if (slots.isEmpty()) {
-            return UNDEFINED;
-        }
-        StringBuilder str = new StringBuilder();
-        for (int slot : slots.stream().sorted().toList()) {
-            str.append(slot).append(",");
-        }
-        if (str.charAt(str.length() - 1) == ',') {
-            str = new StringBuilder(str.substring(0, str.length() - 1));
-        }
-        return str.toString();
-    }
-
-    public static String getClickString(InventoryClickEvent event) {
-        return new ClickEntry(event.getClick(), event.getAction(), event.getRawSlot(), ItemUtils.getItemName(event.getWhoClicked().getItemOnCursor()), ItemUtils.getItemName(event.getWhoClicked().getItemOnCursor())).toString();
-    }
-
     @AllArgsConstructor
     @Data
     public static class ClickEntry {
-        private final ClickType clickType;
-        private final InventoryAction action;
+        private final @NotNull ClickType clickType;
+        private final @NotNull InventoryAction action;
         private final int slot;
-        private final String cursor;
-        private final String clicked;
-
-        public String toString() {
-            return clickType.name() + ";" + action.name() + ";" + slot + ";" + cursor + ";" + clicked;
-        }
+        private final @NotNull String cursor;
+        private final @NotNull String clicked;
 
         @Nullable
-        public static ClickEntry fromString(String str) {
+        public static ClickEntry fromString(@NotNull String str) {
             String[] parts = str.split(";");
             if (parts.length != 5) {
                 return null;
@@ -142,21 +139,21 @@ public class MenuListener implements Listener {
             String clicked = parts[4];
             return new ClickEntry(clickType, action, slot, cursor, clicked);
         }
+
+        public @NotNull String toString() {
+            return clickType.name() + ";" + action.name() + ";" + slot + ";" + cursor + ";" + clicked;
+        }
     }
 
     @AllArgsConstructor
     @Data
     public static class DragEntry {
-        private final DragType dragType;
-        private final Set<Integer> slots;
-        private final String cursor;
-
-        public String toString() {
-            return dragType.name() + ";" + getSlotsString(slots) + ";" + cursor;
-        }
+        private final @NotNull DragType dragType;
+        private final @NotNull Set<Integer> slots;
+        private final @NotNull String cursor;
 
         @Nullable
-        public static DragEntry fromString(String str) {
+        public static DragEntry fromString(@NotNull String str) {
             String[] parts = str.split(";");
             if (parts.length != 3) {
                 return null;
@@ -176,6 +173,10 @@ public class MenuListener implements Listener {
             }
             String itemName = parts[2];
             return new DragEntry(dragType, slots, itemName);
+        }
+
+        public @NotNull String toString() {
+            return dragType.name() + ";" + getSlotsString(slots) + ";" + cursor;
         }
     }
 }

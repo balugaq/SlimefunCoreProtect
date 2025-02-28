@@ -3,9 +3,9 @@ package com.balugaq.slimefuncoreprotect.core.listeners;
 import com.balugaq.slimefuncoreprotect.api.enums.Action;
 import com.balugaq.slimefuncoreprotect.api.logs.LogDao;
 import com.balugaq.slimefuncoreprotect.api.logs.LogEntry;
+import com.balugaq.slimefuncoreprotect.api.utils.Debug;
 import com.balugaq.slimefuncoreprotect.api.utils.NotHumanUsers;
 import com.balugaq.slimefuncoreprotect.api.utils.TimeUtil;
-import com.balugaq.slimefuncoreprotect.api.utils.Debug;
 import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
 import io.github.thebusybiscuit.slimefun4.api.events.BlockPlacerPlaceEvent;
 import io.github.thebusybiscuit.slimefun4.api.events.ExplosiveToolBreakBlocksEvent;
@@ -59,7 +59,7 @@ public class BlockListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onExplosiveToolBreak(ExplosiveToolBreakBlocksEvent event) {
+    public void onExplosiveToolBreak(@NotNull ExplosiveToolBreakBlocksEvent event) {
         SlimefunItem item1 = StorageCacheUtils.getSfItem(event.getPrimaryBlock().getLocation());
         if (item1 != null) {
             Debug.debug("Insert explosive tool break log");

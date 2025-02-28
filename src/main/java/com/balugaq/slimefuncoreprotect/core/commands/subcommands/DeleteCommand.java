@@ -38,7 +38,7 @@ public class DeleteCommand extends ConsoleOnlyCommand {
     }
 
     @Override
-    public boolean onCommand(@NotNull ConsoleCommandSender console, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public boolean onCommand(@NotNull ConsoleCommandSender console, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
         if (args.length < 2) {
             console.sendMessage("Usage: /slimefun delete time:<time>");
             console.sendMessage("Delete all logs older than <time>");

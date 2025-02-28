@@ -9,7 +9,7 @@ import java.time.Instant;
 
 @UtilityClass
 public class TimeUtil {
-    public static Timestamp now() {
+    public static @NotNull Timestamp now() {
         return Timestamp.from(Instant.now());
     }
 

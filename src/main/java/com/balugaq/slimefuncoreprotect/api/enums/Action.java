@@ -16,10 +16,12 @@ public enum Action {
     ;
     private final String key;
     private final boolean hasOtherData;
+
     Action(String key, boolean hasOtherData) {
         this.key = key;
         this.hasOtherData = hasOtherData;
     }
+
     Action(String key) {
         this.key = key;
         this.hasOtherData = false;

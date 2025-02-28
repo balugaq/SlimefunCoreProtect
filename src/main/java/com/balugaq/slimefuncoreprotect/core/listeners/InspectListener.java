@@ -2,7 +2,6 @@ package com.balugaq.slimefuncoreprotect.core.listeners;
 
 import com.balugaq.slimefuncoreprotect.api.logs.LogDao;
 import com.balugaq.slimefuncoreprotect.api.logs.LogEntry;
-import com.balugaq.slimefuncoreprotect.core.commands.subcommands.LookupCommand;
 import com.balugaq.slimefuncoreprotect.core.managers.CommandManager;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -12,6 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.List;
@@ -20,6 +20,7 @@ import java.util.UUID;
 
 public class InspectListener implements Listener {
     private static final Set<UUID> inspectingPlayers = new HashSet<>();
+
     public static boolean isInspecting(UUID player) {
         return inspectingPlayers.contains(player);
     }
@@ -32,8 +33,17 @@ public class InspectListener implements Listener {
         inspectingPlayers.remove(player);
     }
 
+    public static @NotNull List<LogEntry> getLogs(Location location) {
+        return LogDao.getLogsByLocation(LogEntry.getStringBlockLocation(location));
+    }
+
+    public static void inspect(@NotNull Player player, Location location) {
+        List<LogEntry> logs = getLogs(location);
+        CommandManager.lookup(player, logs, null);
+    }
+
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onInspect(BlockBreakEvent event) {
+    public void onInspect(@NotNull BlockBreakEvent event) {
         Player player = event.getPlayer();
         if (isInspecting(player.getUniqueId())) {
             inspect(player, event.getBlock().getLocation());
@@ -42,7 +52,7 @@ public class InspectListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onInspect(PlayerInteractEvent event) {
+    public void onInspect(@NotNull PlayerInteractEvent event) {
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             Player player = event.getPlayer();
             if (isInspecting(player.getUniqueId())) {
@@ -50,14 +60,5 @@ public class InspectListener implements Listener {
                 event.setCancelled(true);
             }
         }
-    }
-
-    public static List<LogEntry> getLogs(Location location) {
-        return LogDao.getLogsByLocation(LogEntry.getStringBlockLocation(location));
-    }
-
-    public static void inspect(Player player, Location location) {
-        List<LogEntry> logs = getLogs(location);
-        CommandManager.lookup(player, logs, null);
     }
 }
