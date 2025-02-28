@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.sql.Timestamp;
 
@@ -20,7 +21,25 @@ public class LogEntry {
     private String action;
     private Location location;
     private String slimefunId;
+    private String otherData;
     private int status;
+
+    public static @NotNull String getStringBlockLocation(@Nullable Location location) {
+        if (location == null) {
+            return "unknown";
+        }
+
+        String string = location.getWorld().getName();
+        string += ";" + location.getBlockX() + ":" + location.getBlockY() + ":" + location.getBlockZ();
+        return string;
+    }
+
+    public static @NotNull String getStringLocation(@Nullable Location location) {
+        if (location == null) {
+            return "unknown";
+        }
+        return location.getWorld().getName() + ";" + location.getX() + ":" + location.getY() + ":" + location.getZ() + ":" + location.getYaw() + ":" + location.getPitch();
+    }
 
     public boolean isRolledBack() {
         return (status & BIT_MASK_ROLLBACKED) != 0;
@@ -65,15 +84,5 @@ public class LogEntry {
                     Float.parseFloat(params[4])
             ));
         }
-    }
-
-    public static @NotNull String getStringBlockLocation(@NotNull Location location) {
-        String string = location.getWorld().getName();
-        string += ";" + location.getBlockX() + ":" + location.getBlockY() + ":" + location.getBlockZ();
-        return string;
-    }
-
-    public static @NotNull String getStringLocation(@NotNull Location location) {
-        return location.getWorld().getName() + ";" + location.getX() + ":" + location.getY() + ":" + location.getZ() + ":" + location.getYaw() + ":" + location.getPitch();
     }
 }

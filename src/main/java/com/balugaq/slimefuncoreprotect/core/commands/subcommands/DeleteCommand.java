@@ -1,7 +1,8 @@
 package com.balugaq.slimefuncoreprotect.core.commands.subcommands;
 
-import com.balugaq.slimefuncoreprotect.api.logs.BlockLogDao;
+import com.balugaq.slimefuncoreprotect.api.logs.LogDao;
 import com.balugaq.slimefuncoreprotect.api.logs.LogEntry;
+import com.balugaq.slimefuncoreprotect.api.utils.TimeUtil;
 import com.balugaq.slimefuncoreprotect.core.commands.ConsoleOnlyCommand;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -45,8 +46,8 @@ public class DeleteCommand extends ConsoleOnlyCommand {
         }
 
         String time = args[1];
-        Timestamp timestamp = LookupCommand.parseTime(time);
-        List<LogEntry> logs = BlockLogDao.getLogsBetween(timestamp, Timestamp.valueOf("1970-01-01 00:00:00.000"));
+        Timestamp timestamp = TimeUtil.parseTime(time);
+        List<LogEntry> logs = LogDao.getLogsBetween(timestamp, Timestamp.valueOf("1970-01-01 00:00:00.000"));
         if (logs.isEmpty()) {
             console.sendMessage("No logs found before time: " + time);
             return true;
@@ -54,7 +55,7 @@ public class DeleteCommand extends ConsoleOnlyCommand {
 
         if (args.length == 3 && "confirm".equalsIgnoreCase(args[2])) {
             for (LogEntry log : logs) {
-                BlockLogDao.deleteLog(log.getPlayer(), log.getTime(), log.getAction(), log.getPlayer(), log.getSlimefunId());
+                LogDao.deleteLog(log.getPlayer(), log.getTime(), log.getAction(), log.getPlayer(), log.getSlimefunId());
             }
             console.sendMessage("Deleted " + logs.size() + " logs older than " + time);
         } else {

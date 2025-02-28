@@ -1,6 +1,6 @@
 package com.balugaq.slimefuncoreprotect.implementation;
 
-import com.balugaq.slimefuncoreprotect.api.logs.BlockDatabaseManager;
+import com.balugaq.slimefuncoreprotect.api.logs.DatabaseManager;
 import com.balugaq.slimefuncoreprotect.api.utils.Lang;
 import com.balugaq.slimefuncoreprotect.core.managers.CommandManager;
 import com.balugaq.slimefuncoreprotect.core.managers.ConfigManager;
@@ -117,7 +117,7 @@ public class SlimefunCoreProtect extends JavaPlugin implements SlimefunAddon {
         getLogger().info("Disabling SlimefunCoreProtect...");
         getLogger().info("Unloading listeners...");
         getListenerManager().unload();
-        BlockDatabaseManager.shutdown();
+        DatabaseManager.shutdown();
         getLogger().info("SlimefunCoreProtect disabled.");
     }
 

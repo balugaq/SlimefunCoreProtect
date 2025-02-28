@@ -1,7 +1,9 @@
 package com.balugaq.slimefuncoreprotect.core.managers;
 
 import com.balugaq.slimefuncoreprotect.core.listeners.BlockListener;
+import com.balugaq.slimefuncoreprotect.core.listeners.InspectListener;
 import com.balugaq.slimefuncoreprotect.core.listeners.MenuListener;
+import com.balugaq.slimefuncoreprotect.core.listeners.PlayerListener;
 import com.balugaq.slimefuncoreprotect.implementation.SlimefunCoreProtect;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -26,6 +28,8 @@ public class ListenerManager {
     public void setup() {
         listeners.add(new BlockListener());
         listeners.add(new MenuListener());
+        listeners.add(new PlayerListener());
+        listeners.add(new InspectListener());
     }
 
     public void load() {

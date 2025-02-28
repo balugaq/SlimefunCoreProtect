@@ -55,7 +55,7 @@ public class PageCommand extends SubCommand {
         if (CommandManager.getLastLookup().containsKey(sender)) {
             List<LogEntry> entries = CommandManager.getLastLookup().get(sender);
             pages.put(sender, Math.max(1, Math.min(page, CommandManager.getMaxPage(entries))));
-            LookupCommand.lookup(sender, entries, null);
+            CommandManager.lookup(sender, entries, null);
         }
 
 
