@@ -56,13 +56,12 @@ public class LogEntry {
     public void setLocation(@NotNull String location) {
         String[] loc = location.split(";");
         if (loc.length < 2) {
-            Debug.log("Invalid location string: " + location);
             return;
         }
 
         World world = Bukkit.getWorld(loc[0]);
         if (world == null) {
-            Debug.log("World not found: " + loc[0]);
+            Debug.debug("World not found: " + loc[0]);
             return;
         }
 

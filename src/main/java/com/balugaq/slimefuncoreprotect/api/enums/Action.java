@@ -26,4 +26,18 @@ public enum Action {
         this.key = key;
         this.hasOtherData = false;
     }
+
+    public static Action of(String key) {
+        for (Action action : Action.values()) {
+            if (action.getKey().equalsIgnoreCase(key)) {
+                return action;
+            }
+
+            if (action.name().equalsIgnoreCase(key)) {
+                return action;
+            }
+        }
+
+        return null;
+    }
 }

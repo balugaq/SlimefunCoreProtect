@@ -56,6 +56,8 @@ public class SlimefunCoreProtect extends JavaPlugin implements SlimefunAddon {
         localizationService.addLanguage(DEFAULT_LANGUAGE);
         getLogger().info("Loading integrations...");
         integrationManager = new IntegrationManager(this);
+        getLogger().info("Loading database...");
+        DatabaseManager.createTable();
         getLogger().info("Loading commands...");
         commandManager = new CommandManager(this);
         commandManager.setup();

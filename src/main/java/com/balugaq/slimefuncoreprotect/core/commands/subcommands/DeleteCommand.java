@@ -47,7 +47,7 @@ public class DeleteCommand extends ConsoleOnlyCommand {
 
         String time = args[1];
         Timestamp timestamp = TimeUtil.parseTime(time);
-        List<LogEntry> logs = LogDao.getLogsBetween(timestamp, Timestamp.valueOf("1970-01-01 00:00:00.000"));
+        List<LogEntry> logs = LogDao.getLogsBetween(Timestamp.valueOf("1970-01-01 00:00:00.000"), timestamp);
         if (logs.isEmpty()) {
             console.sendMessage("No logs found before time: " + time);
             return true;

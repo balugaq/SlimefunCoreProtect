@@ -13,6 +13,8 @@ import lombok.Data;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
+import org.bukkit.FluidCollisionMode;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -64,7 +66,8 @@ public class MenuListener implements Listener {
                 preset.addMenuOpeningHandler((p) -> {
                     Debug.debug("Insert menu open log");
                     opening.add(p.getUniqueId());
-                    LogDao.insertLog(p.getName(), TimeUtil.now(), Action.MENU_OPEN.getKey(), LogEntry.getStringBlockLocation(p.getOpenInventory().getTopInventory().getLocation()), preset.getID());
+                    Block block = p.getTargetBlockExact(8, FluidCollisionMode.NEVER);
+                    LogDao.insertLog(p.getName(), TimeUtil.now(), Action.MENU_OPEN.getKey(), block == null ? "unknown" : LogEntry.getStringBlockLocation(block.getLocation()), preset.getID());
                     handler.onOpen(p);
                 });
             }
@@ -73,7 +76,8 @@ public class MenuListener implements Listener {
                 preset.addMenuCloseHandler((p) -> {
                     Debug.debug("Insert menu close log");
                     opening.remove(p.getUniqueId());
-                    LogDao.insertLog(p.getName(), TimeUtil.now(), Action.MENU_CLOSE.getKey(), LogEntry.getStringBlockLocation(p.getOpenInventory().getTopInventory().getLocation()), preset.getID());
+                    Block block = p.getTargetBlockExact(8, FluidCollisionMode.NEVER);
+                    LogDao.insertLog(p.getName(), TimeUtil.now(), Action.MENU_CLOSE.getKey(), block == null ? "unknown" : LogEntry.getStringBlockLocation(block.getLocation()), preset.getID());
                     closeHandler.onClose(p);
                 });
             }

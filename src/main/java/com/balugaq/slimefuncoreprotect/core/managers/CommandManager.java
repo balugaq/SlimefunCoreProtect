@@ -68,7 +68,7 @@ public class CommandManager implements TabExecutor {
     }
 
     public static @NotNull String humanizeAction(@NotNull String actionStr) {
-        return humanizeAction(Action.valueOf(actionStr.toUpperCase()));
+        return humanizeAction(Action.of(actionStr));
     }
 
     public static @NotNull String humanizeAction(@NotNull Action action) {
@@ -119,48 +119,60 @@ public class CommandManager implements TabExecutor {
                             "<click><a>copy_to_clipboard</a><v>" + humanizeAction(entry.getAction()) + "</v></click>"
             ));
 
-            Action action = Action.valueOf(entry.getAction());
+            Action action = Action.of(entry.getAction());
             if (action == Action.MENU_CLICK) {
                 String otherData = entry.getOtherData();
                 MenuListener.ClickEntry clickEntry = MenuListener.ClickEntry.fromString(otherData);
                 if (clickEntry != null) {
                     newline();
                     sender.spigot().sendMessage(formatMessage(
-                            "&7 * <hover><d>" + spaces + "&3Slot: " + clickEntry.getSlot() + "</d><h>&d点击复制: " + clickEntry.getSlot() + "</h></hover>" +
-                                    "<click><a>copy_to_clipboard</a><v>" + clickEntry.getSlot() + "</v></click>" +
-                                    "&7 * <hover><d>" + spaces + "&5Clicked: " + clickEntry.getClicked() + "</d><h>&d点击复制: " + clickEntry.getClicked() + "</h></hover>" +
-                                    "<click><a>copy_to_clipboard</a><v>" + clickEntry.getClicked() + "</v></click>" +
-                                    "&7 * <hover><d>" + spaces + "&6Cursor: " + clickEntry.getCursor() + "</d><h>&d点击复制: " + clickEntry.getCursor() + "</h></hover>" +
-                                    "<click><a>copy_to_clipboard</a><v>" + clickEntry.getCursor() + "</v></click>"
+                        "&7 * " + spaces + "<hover><d>&6Cursor: " + clickEntry.getCursor() + " &d[点击复制]</d><h>&d[点击复制]</h></hover>" +
+                        "<click><a>copy_to_clipboard</a><v>" + clickEntry.getCursor() + "</v></click>" +
+                        "&7 * <hover><d>&3Slot: " + clickEntry.getSlot() + " &d[点击复制]</d><h>&d[点击复制]</h></hover>" +
+                        "<click><a>copy_to_clipboard</a><v>" + clickEntry.getSlot() + "</v></click>"
+                    ));
+
+                    newline();
+                    sender.spigot().sendMessage(formatMessage(
+                        "&7 * " + spaces + "<hover><d>&2Clicked: " + clickEntry.getClicked() + " &d[点击复制]</d><h>&d[点击复制]</h></hover>" +
+                        "<click><a>copy_to_clipboard</a><v>" + clickEntry.getClicked() + "</v></click>"
                     ));
                 }
             } else if (action == Action.MENU_DRAG) {
                 String otherData = entry.getOtherData();
                 MenuListener.DragEntry dragEntry = MenuListener.DragEntry.fromString(otherData);
                 if (dragEntry != null) {
+                    List<Integer> slots = dragEntry.getSlots().stream().sorted().toList();
                     newline();
                     sender.spigot().sendMessage(formatMessage(
-                            "&7 * <hover><d>" + spaces + "&3Slots: " + dragEntry.getSlots() + "</d><h>&d点击复制: " + dragEntry.getSlots() + "</h></hover>" +
-                                    "<click><a>copy_to_clipboard</a><v>" + dragEntry.getSlots() + "</v></click>" +
-                                    "&7 * <hover><d>" + spaces + "&5Cursor: " + dragEntry.getCursor() + "</d><h>&d点击复制: " + dragEntry.getCursor() + "</h></hover>" +
-                                    "<click><a>copy_to_clipboard</a><v>" + dragEntry.getCursor() + "</v></click>"
+                            "&7 * " + spaces + "<hover><d>&6Cursor: " + dragEntry.getCursor() + " &d[点击复制]</d><h>&d[点击复制]</h></hover>" +
+                            "<click><a>copy_to_clipboard</a><v>" + dragEntry.getCursor() + "</v></click>" +
+                            "&7 * <hover><d>&3Slots: " + slots + " &d[点击复制]</d><h>&d[点击复制]</h></hover>" +
+                            "<click><a>copy_to_clipboard</a><v>" + slots + "</v></click>"
                     ));
                 }
             }
 
-            newline();
-            sender.spigot().sendMessage(formatMessage(
-                    "&7 * <hover><d>" + spaces + "&7&o(x" + location.getBlockX() + "/y" + location.getBlockY() + "/z" + location.getBlockZ() + "/" + location.getWorld().getName() + ")" + "</d><h>&b点击传送到该位置</h></hover>" +
-                            "<click>=<a>run_command</a><v>/minecraft:tp " + location.getBlockX() + " " + location.getBlockY() + " " + location.getBlockZ() + "</v></click>"
-            ));
+            if (location != null) {
+                newline();
+                sender.spigot().sendMessage(formatMessage(
+                        "&7 * <hover><d>" + spaces + "&7&o(x" + location.getBlockX() + "/y" + location.getBlockY() + "/z" + location.getBlockZ() + "/" + location.getWorld().getName() + ")" + "</d><h>&b点击传送到该位置</h></hover>" +
+                                "<click>=<a>run_command</a><v>/minecraft:tp " + location.getBlockX() + " " + location.getBlockY() + " " + location.getBlockZ() + "</v></click>"
+                ));
 
-            newline();
-            sender.spigot().sendMessage(formatMessage(
-                    "&7 * <hover><d>" + spaces + "&a&o物品: " + getName(entry.getSlimefunId()) + "</d><h>&d点击复制: " + entry.getSlimefunId() + "</h></hover>" +
-                            "<click><a>copy_to_clipboard</a><v>" + entry.getSlimefunId() + "</v></click>"
-            ));
+                newline();
+                sender.spigot().sendMessage(formatMessage(
+                        "&7 * <hover><d>" + spaces + "&a&o物品: " + getName(entry.getSlimefunId()) + "</d><h>&d点击复制: " + entry.getSlimefunId() + "</h></hover>" +
+                                "<click><a>copy_to_clipboard</a><v>" + entry.getSlimefunId() + "</v></click>"
+                ));
+            }
         }
-        pageSwitch(sender, entries, command);
+
+        if (!splitted.isEmpty()) {
+            sendPageSwitch(sender, entries, command);
+        } else {
+            sender.sendMessage(Lang.getMessage("commands.no-logs"));
+        }
     }
 
     // An empty method, just notice the reader
@@ -204,7 +216,6 @@ public class CommandManager implements TabExecutor {
     public static BaseComponent @NotNull [] formatMessage(@NotNull String message) {
         ComponentBuilder builder = new ComponentBuilder();
         try {
-            message = format(message);
             while (!message.isEmpty()) {
                 Matcher matcher = TAG_PATTERN.matcher(message);
                 if (!matcher.find()) {
@@ -266,8 +277,8 @@ public class CommandManager implements TabExecutor {
         return ChatColor.translateAlternateColorCodes('&', message);
     }
 
-    public static void pageSwitch(@NotNull CommandSender sender, @NotNull List<LogEntry> entries, @Nullable String command) {
-        sender.spigot().sendMessage(formatMessage("&a第 " + getCurrentPage(sender) + " / " + getMaxPage(entries) + " 页." + EMPTY_PLACEHOLDER + " &b<上一页><click><a>run_command</a><v>/sco page " + Math.max(1, getCurrentPage(sender) - 1) + "</v></click> &b<下一页><click><a>run_command</a><v>/sco page " + (Math.min(getCurrentPage(sender) + 1, getMaxPage(entries))) + "</v></click>"));
+    public static void sendPageSwitch(@NotNull CommandSender sender, @NotNull List<LogEntry> entries, @Nullable String command) {
+        sender.spigot().sendMessage(formatMessage("&a第 " + getCurrentPage(sender) + " / " + getMaxPage(entries) + " 页." + EMPTY_PLACEHOLDER + " <hover><d>&b<上一页></d><h>&b<上一页></h></hover><click><a>run_command</a><v>/sco page " + Math.max(1, getCurrentPage(sender) - 1) + "</v></click> <hover><d>&b<下一页></d><h>&b<下一页></h></hover><click><a>run_command</a><v>/sco page " + (Math.min(getCurrentPage(sender) + 1, getMaxPage(entries))) + "</v></click>"));
         if (command != null) {
             sender.sendMessage(command);
         }

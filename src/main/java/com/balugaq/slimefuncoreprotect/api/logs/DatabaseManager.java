@@ -19,7 +19,7 @@ public class DatabaseManager {
     @Getter
     public static DataSource dataSource = SourceManager.getDataSource();
 
-    private static void createTable() {
+    public static void createTable() {
         DatabaseType dbType = SlimefunCoreProtect.getInstance().getConfigManager().getDatabaseType();
         String sql = null;
         if (dbType == DatabaseType.SQLITE) {

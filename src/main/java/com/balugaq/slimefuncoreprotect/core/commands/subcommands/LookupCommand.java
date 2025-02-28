@@ -12,6 +12,7 @@ import com.balugaq.slimefuncoreprotect.core.managers.CommandManager;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -58,10 +59,8 @@ public class LookupCommand extends SubCommand {
     @Nullable
     public static Action getAction(String @NotNull [] args) {
         for (String arg : args) {
-            for (String section : SECTIONS) {
-                if (arg.startsWith(section)) {
-                    return Action.valueOf(arg.replace(section, "").trim());
-                }
+            if (arg.equals("action:")) {
+                return Action.valueOf(arg.replace("action:", "").trim());
             }
         }
 
@@ -221,8 +220,10 @@ public class LookupCommand extends SubCommand {
 
         Action action = getAction(args);
         Map<String, String> commandArgs = getCommandArgs(args);
+        for (Map.Entry<String, String> entry : commandArgs.entrySet()) {
+            Debug.debug("Command arg: " + entry.getKey() + " = " + entry.getValue());
+        }
 
-        List<LogEntry> removes = new ArrayList<>();
         List<LogEntry> entries = LogDao.getLogs(commandArgs);
         if (entries.isEmpty()) {
             sender.sendMessage("No entries found.");
@@ -233,6 +234,7 @@ public class LookupCommand extends SubCommand {
             args = new String[]{"radius:10"};
         }
 
+        List<LogEntry> removes = new ArrayList<>();
         handleLookupArgs(args, action, sender, entries, removes);
         entries.removeAll(removes);
 
@@ -273,7 +275,7 @@ public class LookupCommand extends SubCommand {
         String last = args[args.length - 1];
         if (last.startsWith("action:")) {
             for (Action action : Action.values()) {
-                String s = "action:" + CommandManager.humanizeAction(action);
+                String s = "action:" + ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', CommandManager.humanizeAction(action)));
                 phase2.add(s);
             }
         }
