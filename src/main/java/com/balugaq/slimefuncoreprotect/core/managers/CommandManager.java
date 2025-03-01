@@ -191,7 +191,7 @@ public class CommandManager implements TabExecutor {
         if (!splitted.isEmpty()) {
             sendPageSwitch(sender, entries, command);
         } else {
-            sender.sendMessage(Lang.getMessage("commands.no-logs"));
+            sender.sendMessage(Lang.getMessage("commands.lookup.no-logs-found"));
         }
     }
 
