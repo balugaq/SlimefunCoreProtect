@@ -44,6 +44,7 @@ import java.util.regex.Pattern;
 
 @Getter
 public class CommandManager implements TabExecutor {
+    // Used to split normal text and advanced text
     private static final String EMPTY_PLACEHOLDER = "<hover><d></d><h></h></hover>";
     private static final Pattern CLICK_TAG_PATTERN = Pattern.compile("<a>(.*?)</a><v>(.*?)</v>", Pattern.DOTALL);
     private static final Pattern HOVER_TAG_PATTERN = Pattern.compile("<d>(.*?)</d><h>(.*?)</h>", Pattern.DOTALL);
@@ -273,8 +274,12 @@ public class CommandManager implements TabExecutor {
     private static void processHoverTag(@NotNull ComponentBuilder builder, @NotNull String content) {
         Matcher m = HOVER_TAG_PATTERN.matcher(content);
         if (m.find()) {
-            BaseComponent[] display = TextComponent.fromLegacyText(format(m.group(1)));
+            BaseComponent[] displays = TextComponent.fromLegacyText(format(m.group(1)));
             BaseComponent[] hover = TextComponent.fromLegacyText(format(m.group(2)));
+            BaseComponent display = new TextComponent(displays[0]);
+            for (int i = 1; i < displays.length; i++) {
+                display.addExtra(displays[i]);
+            }
             builder.append(display)
                     .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(hover)));
         }
