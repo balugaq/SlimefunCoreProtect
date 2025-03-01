@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ConsoleQueryUser extends QueryUser {
     private final ConsoleCommandSender console;
+
     public ConsoleQueryUser(ConsoleCommandSender console) {
         this.console = console;
     }
@@ -25,11 +26,12 @@ public class ConsoleQueryUser extends QueryUser {
     }
 
     @Override
-    public boolean hasPermission(String node) {
+    public boolean hasPermission(@NotNull String node) {
         return console.hasPermission(node);
     }
+
     @Override
-    public void sendMessage(String message) {
+    public void sendMessage(@NotNull String message) {
         console.sendMessage(message);
     }
 }

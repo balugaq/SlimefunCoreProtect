@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 @Getter
 public class PlayerQueryUser extends QueryUser {
     private final Player player;
+
     public PlayerQueryUser(Player player) {
         this.player = player;
     }
@@ -27,12 +28,12 @@ public class PlayerQueryUser extends QueryUser {
     }
 
     @Override
-    public boolean hasPermission(String node) {
+    public boolean hasPermission(@NotNull String node) {
         return player.hasPermission(node);
     }
 
     @Override
-    public void sendMessage(String message) {
+    public void sendMessage(@NotNull String message) {
         player.sendMessage(message);
     }
 }

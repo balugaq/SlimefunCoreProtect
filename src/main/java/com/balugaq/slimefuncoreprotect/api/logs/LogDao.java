@@ -15,6 +15,7 @@ import java.util.Map;
 
 public class LogDao {
     private static final long THRESHOLD = 1000L;
+
     public static void deleteLog(String user, Timestamp time, String action, String location, String slimefunId) {
         String sql = "DELETE FROM user_logs WHERE user = ? AND time = ? AND action = ? AND location = ? AND slimefun_id = ?";
         try (Connection conn = DatabaseManager.getDataSource().getConnection();
@@ -61,7 +62,7 @@ public class LogDao {
         }
     }
 
-    public static @NotNull List<LogEntry> getLogs(QueryUser user, @NotNull Map<String, String> sections) {
+    public static @NotNull List<LogEntry> getLogs(@NotNull QueryUser user, @NotNull Map<String, String> sections) {
         StringBuilder sql = new StringBuilder("SELECT * FROM user_logs");
         List<Object> params = new ArrayList<>();
         List<String> conditions = new ArrayList<>();
@@ -119,42 +120,42 @@ public class LogDao {
         return 0L;
     }
 
-    public static @NotNull List<LogEntry> getLogsByUser(QueryUser user, String u) {
+    public static @NotNull List<LogEntry> getLogsByUser(@NotNull QueryUser user, String u) {
         String sql = "SELECT * FROM user_logs WHERE user = ?";
         return query(user, sql, u);
     }
 
-    public static @NotNull List<LogEntry> getLogsByTime(QueryUser user, Timestamp time) {
+    public static @NotNull List<LogEntry> getLogsByTime(@NotNull QueryUser user, Timestamp time) {
         String sql = "SELECT * FROM user_logs WHERE time = ?";
         return query(user, sql, time);
     }
 
-    public static @NotNull List<LogEntry> getLogsBetween(QueryUser user, Timestamp start, Timestamp end) {
+    public static @NotNull List<LogEntry> getLogsBetween(@NotNull QueryUser user, Timestamp start, Timestamp end) {
         String sql = "SELECT * FROM user_logs WHERE time BETWEEN ? AND ?";
         return query(user, sql, start, end);
     }
 
-    public static @NotNull List<LogEntry> getLogsByAction(QueryUser user, String action) {
+    public static @NotNull List<LogEntry> getLogsByAction(@NotNull QueryUser user, String action) {
         String sql = "SELECT * FROM user_logs WHERE action = ?";
         return query(user, sql, action);
     }
 
-    public static @NotNull List<LogEntry> getLogsByLocation(QueryUser user, String location) {
+    public static @NotNull List<LogEntry> getLogsByLocation(@NotNull QueryUser user, String location) {
         String sql = "SELECT * FROM user_logs WHERE location = ?";
         return query(user, sql, location);
     }
 
-    public static @NotNull List<LogEntry> getLogsBySlimefunId(QueryUser user, String slimefunId) {
+    public static @NotNull List<LogEntry> getLogsBySlimefunId(@NotNull QueryUser user, String slimefunId) {
         String sql = "SELECT * FROM user_logs WHERE slimefun_id = ?";
         return query(user, sql, slimefunId);
     }
 
-    public static @NotNull List<LogEntry> getAllLogs(QueryUser user) {
+    public static @NotNull List<LogEntry> getAllLogs(@NotNull QueryUser user) {
         String sql = "SELECT * FROM user_logs";
         return query(user, sql);
     }
 
-    private static @NotNull List<LogEntry> query(QueryUser user, String sql, Object @NotNull ... params) {
+    private static @NotNull List<LogEntry> query(@NotNull QueryUser user, String sql, Object @NotNull ... params) {
         if (QueryUser.isOutdated(user, THRESHOLD)) {
             QueryUser.updateLastQueryTime(user);
         } else {

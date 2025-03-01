@@ -48,6 +48,19 @@ public class DatabaseManager {
                         status INT DEFAULT 0
                     )
                     """;
+        } else if (dbType == DatabaseType.POSTGRESQL) {
+            sql = """
+                    CREATE TABLE IF NOT EXISTS user_logs (
+                        id SERIAL PRIMARY KEY,
+                        user VARCHAR(255),
+                        time TIMESTAMP,
+                        action VARCHAR(255),
+                        location VARCHAR(255),
+                        slimefun_id VARCHAR(255),
+                        other_data TEXT,
+                        status INT DEFAULT 0
+                    )
+                    """;
         }
         if (sql == null) {
             Debug.log("Unsupported database type: " + dbType);
@@ -68,9 +81,9 @@ public class DatabaseManager {
         DatabaseType dbType = SlimefunCoreProtect.getInstance().getConfigManager().getDatabaseType();
         String sql = null;
         if (dbType == DatabaseType.SQLITE) {
-            sql = "INSERT INTO user_logs (user, time, action, location, slimefun_id, other_data, status) VALUES (?,?,?,?,?,?,?)";
-        } else if (dbType == DatabaseType.MYSQL) {
-            sql = "INSERT INTO user_logs (user, time, action, location, slimefun_id, other_data, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            sql = "INSERT INTO user_logs (user, time, action, location, slimefun_id, other_data) VALUES (?,?,?,?,?,?)";
+        } else if (dbType == DatabaseType.MYSQL || dbType == DatabaseType.POSTGRESQL) {
+            sql = "INSERT INTO user_logs (user, time, action, location, slimefun_id, other_data) VALUES (?, ?, ?, ?, ?, ?)";
         }
         if (sql == null) {
             Debug.log("Unsupported database type: " + dbType);

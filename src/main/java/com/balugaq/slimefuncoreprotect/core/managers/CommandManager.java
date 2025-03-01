@@ -46,6 +46,7 @@ import java.util.regex.Pattern;
 public class CommandManager implements TabExecutor {
     public static final String EMPTY_PLACEHOLDER = "<hover><d></d><h></h></hover>";
     public static final Pattern CLICK_TAG_PATTERN = Pattern.compile("<a>(.*?)</a><v>(.*?)</v>", Pattern.DOTALL);
+    public static final Pattern HOVER_TAG_PATTERN = Pattern.compile("<d>(.*?)</d><h>(.*?)</h>", Pattern.DOTALL);
     @Getter
     private static final Map<CommandSender, List<LogEntry>> lastLookup = new HashMap<>();
     @Getter
@@ -258,7 +259,6 @@ public class CommandManager implements TabExecutor {
         return builder.create();
     }
 
-    public static final Pattern HOVER_TAG_PATTERN = Pattern.compile("<d>(.*?)</d><h>(.*?)</h>", Pattern.DOTALL);
     private static void processHoverTag(@NotNull ComponentBuilder builder, @NotNull String content) {
         Matcher m = HOVER_TAG_PATTERN.matcher(content);
         if (m.find()) {

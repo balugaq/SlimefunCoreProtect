@@ -1,6 +1,7 @@
 package com.balugaq.slimefuncoreprotect.api.enums;
 
 import lombok.Getter;
+import org.jetbrains.annotations.Nullable;
 
 @Getter
 public enum Action {
@@ -27,7 +28,7 @@ public enum Action {
         this.hasOtherData = false;
     }
 
-    public static Action of(String key) {
+    public static @Nullable Action of(String key) {
         for (Action action : Action.values()) {
             if (action.getKey().equalsIgnoreCase(key)) {
                 return action;

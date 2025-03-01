@@ -34,10 +34,10 @@ import java.util.Map;
 import java.util.Set;
 
 public class LookupCommand extends SubCommand {
-    private static final Map<CommandSender, QueryUser> queryUsers = new HashMap<>();
     public static final Set<String> SLIMEFUN_ITEM_IDS = new HashSet<>();
     public static final Set<String> SECTIONS = new HashSet<>();
     public static final Map<String, List<Action>> UNCOMMON_SECTIONS = new HashMap<>();
+    private static final Map<CommandSender, QueryUser> queryUsers = new HashMap<>();
 
     static {
         SECTIONS.add("action:");

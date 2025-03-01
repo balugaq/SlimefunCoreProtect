@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class PlayerListener implements Listener {
-    public static String getActionString(@NotNull PlayerInteractEvent event) {
+    public static @NotNull String getActionString(@NotNull PlayerInteractEvent event) {
         return new ActionEntry(event.getAction()).toString();
     }
 

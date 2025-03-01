@@ -32,14 +32,14 @@ public class ConfigManager {
     @Since(ConfigVersion.C_20250226_1)
     private final @NotNull String LANGUAGE;
     private final @NotNull JavaPlugin plugin;
+    @Since(ConfigVersion.C_20250301_1)
+    private final int MAX_CONTENT_PER_PAGE;
     @Since(ConfigVersion.C_20250226_1)
     private BuildStation BUILD_STATION;
     @Since(ConfigVersion.C_20250226_1)
     private ConfigVersion CONFIG_VERSION;
     @Since(ConfigVersion.C_20250226_2)
     private DatabaseType DATABASE_TYPE;
-    @Since(ConfigVersion.C_20250301_1)
-    private final int MAX_CONTENT_PER_PAGE;
 
     public ConfigManager(@NotNull JavaPlugin plugin) {
         this.plugin = plugin;

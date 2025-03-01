@@ -5,7 +5,7 @@ auto-update: true
 build-station: "Guizhan" # Expected "Guizhan" / "Blob"
 
 # Do not change this value unless you know what you are doing.
-config-version: C_20250301_1
+config-version: C_20250301_2
 
 max-content-per-page: 5
 
@@ -13,8 +13,17 @@ max-content-per-page: 5
 debug: false
 
 database:
-  type: sqlite # Expected sqlite / mysql
+  type: sqlite # Expected sqlite / mysql / postgresql
 
+  # Note: This feature has not been fully tested!!! Use it at your own risk.
+  postgresql:
+    host: 127.0.0.1
+    port: 5432
+    database: ""
+    user: ""
+    password: ""
+    useSSL: false
+    maxConnection: 10
   # Note: This feature has not been fully tested!!! Use it at your own risk.
   mysql:
     host: 127.0.0.1

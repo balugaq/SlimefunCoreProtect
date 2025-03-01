@@ -13,11 +13,7 @@ import java.util.WeakHashMap;
 @Getter
 public abstract class QueryUser {
     private static final Map<QueryUser, Long> lastQueryTime = new WeakHashMap<>();
-    public abstract @NotNull String getUsername();
-    public abstract boolean isOnline();
-    public abstract boolean isOp();
-    public abstract boolean hasPermission(String node);
-    public abstract void sendMessage(String message);
+
     public static void updateLastQueryTime(QueryUser user) {
         lastQueryTime.put(user, System.currentTimeMillis());
     }
@@ -39,7 +35,7 @@ public abstract class QueryUser {
     }
 
     @Contract("null -> null; !null -> new")
-    public static QueryUser create(ConsoleCommandSender console) {
+    public static QueryUser create(@Nullable ConsoleCommandSender console) {
         if (console == null) {
             return null;
         }
@@ -48,7 +44,7 @@ public abstract class QueryUser {
     }
 
     @Contract("null -> null; !null -> new")
-    public static QueryUser create(Player player) {
+    public static QueryUser create(@Nullable Player player) {
         if (player == null) {
             return null;
         }
@@ -60,12 +56,20 @@ public abstract class QueryUser {
     public static QueryUser create(Object object) {
         if (object instanceof ConsoleCommandSender console) {
             return create(console);
-        }
-
-        else if (object instanceof Player player) {
+        } else if (object instanceof Player player) {
             return create(player);
         }
 
         return null;
     }
+
+    public abstract @NotNull String getUsername();
+
+    public abstract boolean isOnline();
+
+    public abstract boolean isOp();
+
+    public abstract boolean hasPermission(String node);
+
+    public abstract void sendMessage(String message);
 }

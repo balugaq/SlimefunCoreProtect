@@ -40,7 +40,7 @@ public class MenuListener implements Listener {
     private static final Set<UUID> opening = new HashSet<>();
     private static final boolean isCNSlimefun = SlimefunCoreProtect.getInstance().getIntegrationManager().isCNSlimefun();
 
-    public static String getDragString(@NotNull InventoryDragEvent event) {
+    public static @NotNull String getDragString(@NotNull InventoryDragEvent event) {
         return new DragEntry(event.getType(), event.getRawSlots(), ItemUtils.getItemName(event.getWhoClicked().getItemOnCursor())).toString();
     }
 
@@ -58,7 +58,7 @@ public class MenuListener implements Listener {
         return str.toString();
     }
 
-    public static String getClickString(@NotNull InventoryClickEvent event) {
+    public static @NotNull String getClickString(@NotNull InventoryClickEvent event) {
         return new ClickEntry(event.getClick(), event.getAction(), event.getRawSlot(), ItemUtils.getItemName(event.getWhoClicked().getItemOnCursor()), ItemUtils.getItemName(event.getWhoClicked().getItemOnCursor())).toString();
     }
 

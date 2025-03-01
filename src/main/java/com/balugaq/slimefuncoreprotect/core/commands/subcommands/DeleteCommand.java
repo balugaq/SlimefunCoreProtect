@@ -21,6 +21,7 @@ import java.util.Map;
 
 public class DeleteCommand extends ConsoleOnlyCommand {
     private static final Map<ConsoleCommandSender, QueryUser> queryUsers = new HashMap<>();
+
     public DeleteCommand(@NotNull JavaPlugin plugin) {
         super(plugin);
     }
