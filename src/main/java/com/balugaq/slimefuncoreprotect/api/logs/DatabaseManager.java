@@ -17,7 +17,7 @@ import java.sql.Timestamp;
 @Getter
 public class DatabaseManager {
     @Getter
-    public static DataSource dataSource = SourceManager.getDataSource();
+    private static DataSource dataSource = SourceManager.getDataSource();
 
     public static void createTable() {
         DatabaseType dbType = SlimefunCoreProtect.getInstance().getConfigManager().getDatabaseType();

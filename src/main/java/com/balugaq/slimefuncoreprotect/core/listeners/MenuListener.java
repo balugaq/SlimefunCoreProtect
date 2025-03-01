@@ -36,9 +36,14 @@ import java.util.UUID;
 
 @SuppressWarnings("deprecation")
 public class MenuListener implements Listener {
-    public static final String UNDEFINED = "undefined";
+    private static final String UNDEFINED = "undefined";
     private static final Set<UUID> opening = new HashSet<>();
     private static final boolean isCNSlimefun = SlimefunCoreProtect.getInstance().getIntegrationManager().isCNSlimefun();
+
+    @NotNull
+    public static String getUndefined() {
+        return UNDEFINED;
+    }
 
     public static @NotNull String getDragString(@NotNull InventoryDragEvent event) {
         return new DragEntry(event.getType(), event.getRawSlots(), ItemUtils.getItemName(event.getWhoClicked().getItemOnCursor())).toString();

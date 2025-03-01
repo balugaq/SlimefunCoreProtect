@@ -44,9 +44,9 @@ import java.util.regex.Pattern;
 
 @Getter
 public class CommandManager implements TabExecutor {
-    public static final String EMPTY_PLACEHOLDER = "<hover><d></d><h></h></hover>";
-    public static final Pattern CLICK_TAG_PATTERN = Pattern.compile("<a>(.*?)</a><v>(.*?)</v>", Pattern.DOTALL);
-    public static final Pattern HOVER_TAG_PATTERN = Pattern.compile("<d>(.*?)</d><h>(.*?)</h>", Pattern.DOTALL);
+    private static final String EMPTY_PLACEHOLDER = "<hover><d></d><h></h></hover>";
+    private static final Pattern CLICK_TAG_PATTERN = Pattern.compile("<a>(.*?)</a><v>(.*?)</v>", Pattern.DOTALL);
+    private static final Pattern HOVER_TAG_PATTERN = Pattern.compile("<d>(.*?)</d><h>(.*?)</h>", Pattern.DOTALL);
     @Getter
     private static final Map<CommandSender, List<LogEntry>> lastLookup = new HashMap<>();
     @Getter
@@ -57,13 +57,24 @@ public class CommandManager implements TabExecutor {
     private final @NotNull JavaPlugin plugin;
     private final List<SubCommand> subCommands = new ArrayList<>();
     private final @NotNull SubCommand defaultCommand;
-
     public CommandManager(@NotNull JavaPlugin plugin) {
         Preconditions.checkNotNull(plugin, "Plugin cannot be null");
         this.plugin = plugin;
         this.defaultCommand = new HelpCommand(plugin);
         setup();
         registerCommand();
+    }
+
+    public static String getEmptyPlaceholder() {
+        return EMPTY_PLACEHOLDER;
+    }
+
+    public static Pattern getClickTagPattern() {
+        return CLICK_TAG_PATTERN;
+    }
+
+    public static Pattern getHoverTagPattern() {
+        return HOVER_TAG_PATTERN;
     }
 
     public static @NotNull String humanizeAction(@NotNull String actionStr) {

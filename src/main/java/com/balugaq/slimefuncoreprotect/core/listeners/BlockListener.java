@@ -49,7 +49,7 @@ public class BlockListener implements Listener {
         if (item != null) {
             Debug.debug("Insert block placer place log");
             LogDao.insertLog(
-                    NotHumanUsers.USER_BLOCK_PLACER,
+                    NotHumanUsers.getUserBlockPlacer(),
                     TimeUtil.now(),
                     Action.BLOCK_PLACE.getKey(),
                     LogEntry.getStringBlockLocation(event.getBlock().getLocation()),
@@ -64,7 +64,7 @@ public class BlockListener implements Listener {
         if (item1 != null) {
             Debug.debug("Insert explosive tool break log");
             LogDao.insertLog(
-                    NotHumanUsers.USER_EXPLOSIVE_TOOL,
+                    NotHumanUsers.getUserExplosiveTool(),
                     TimeUtil.now(),
                     Action.BLOCK_BREAK.getKey(),
                     LogEntry.getStringBlockLocation(event.getPrimaryBlock().getLocation()),
@@ -76,7 +76,7 @@ public class BlockListener implements Listener {
             if (item != null) {
                 Debug.debug("Insert explosive tool break log");
                 LogDao.insertLog(
-                        NotHumanUsers.USER_EXPLOSIVE_TOOL,
+                        NotHumanUsers.getUserExplosiveTool(),
                         TimeUtil.now(),
                         Action.BLOCK_BREAK.getKey(),
                         LogEntry.getStringBlockLocation(block.getLocation()),

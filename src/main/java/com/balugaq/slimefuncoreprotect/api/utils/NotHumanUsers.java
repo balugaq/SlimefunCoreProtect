@@ -11,9 +11,9 @@ import java.util.Set;
 
 @UtilityClass
 public class NotHumanUsers {
-    public static final Map<String, Plugin> NOT_HUMAN_USERS = new HashMap<>();
-    public static final String USER_EXPLOSIVE_TOOL = "#ExplosiveTool";
-    public static final String USER_BLOCK_PLACER = "#BlockPlacer";
+    private static final Map<String, Plugin> NOT_HUMAN_USERS = new HashMap<>();
+    private static final String USER_EXPLOSIVE_TOOL = "#ExplosiveTool";
+    private static final String USER_BLOCK_PLACER = "#BlockPlacer";
 
     static {
         NOT_HUMAN_USERS.put(USER_EXPLOSIVE_TOOL, SlimefunCoreProtect.getInstance());
@@ -22,5 +22,13 @@ public class NotHumanUsers {
 
     public static @NotNull Set<String> getNotHumanUsers() {
         return NOT_HUMAN_USERS.keySet();
+    }
+
+    public static @NotNull String getUserExplosiveTool() {
+        return USER_EXPLOSIVE_TOOL;
+    }
+
+    public static @NotNull String getUserBlockPlacer() {
+        return USER_BLOCK_PLACER;
     }
 }
