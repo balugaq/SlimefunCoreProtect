@@ -34,6 +34,9 @@ public class HelpCommand extends SubCommand {
         sender.sendMessage(Lang.getMessage("commands.help.help"));
         sender.sendMessage(Lang.getMessage("commands.help.reload"));
         sender.sendMessage(Lang.getMessage("commands.help.version"));
+        sender.sendMessage(Lang.getMessage("commands.help.inspect"));
+        sender.sendMessage(Lang.getMessage("commands.help.lookup"));
+        sender.sendMessage(Lang.getMessage("commands.help.delete"));
         return true;
     }
 

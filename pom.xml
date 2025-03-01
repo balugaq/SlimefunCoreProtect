@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.balugaq.slimefuncoreprotect</groupId>
     <artifactId>SlimefunCoreProtect</artifactId>
-    <version>3</version>
+    <version>4</version>
 
     <pluginRepositories>
         <pluginRepository>

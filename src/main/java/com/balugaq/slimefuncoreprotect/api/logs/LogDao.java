@@ -1,5 +1,6 @@
 package com.balugaq.slimefuncoreprotect.api.logs;
 
+import com.balugaq.slimefuncoreprotect.api.QueryUser;
 import com.balugaq.slimefuncoreprotect.api.utils.Debug;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 public class LogDao {
+    private static final long THRESHOLD = 1000L;
     public static void deleteLog(String user, Timestamp time, String action, String location, String slimefunId) {
         String sql = "DELETE FROM user_logs WHERE user = ? AND time = ? AND action = ? AND location = ? AND slimefun_id = ?";
         try (Connection conn = DatabaseManager.getDataSource().getConnection();
@@ -59,7 +61,7 @@ public class LogDao {
         }
     }
 
-    public static @NotNull List<LogEntry> getLogs(@NotNull Map<String, String> sections) {
+    public static @NotNull List<LogEntry> getLogs(QueryUser user, @NotNull Map<String, String> sections) {
         StringBuilder sql = new StringBuilder("SELECT * FROM user_logs");
         List<Object> params = new ArrayList<>();
         List<String> conditions = new ArrayList<>();
@@ -98,7 +100,7 @@ public class LogDao {
         Debug.log("SQL: " + sql.toString());
         Debug.log("Params: " + params.toString());
 
-        return query(sql.toString(), params.toArray());
+        return query(user, sql.toString(), params.toArray());
     }
 
     public static long getTime(@NotNull String time) {
@@ -117,42 +119,49 @@ public class LogDao {
         return 0L;
     }
 
-    public static @NotNull List<LogEntry> getLogsByUser(String user) {
+    public static @NotNull List<LogEntry> getLogsByUser(QueryUser user, String u) {
         String sql = "SELECT * FROM user_logs WHERE user = ?";
-        return query(sql, user);
+        return query(user, sql, u);
     }
 
-    public static @NotNull List<LogEntry> getLogsByTime(Timestamp time) {
+    public static @NotNull List<LogEntry> getLogsByTime(QueryUser user, Timestamp time) {
         String sql = "SELECT * FROM user_logs WHERE time = ?";
-        return query(sql, time);
+        return query(user, sql, time);
     }
 
-    public static @NotNull List<LogEntry> getLogsBetween(Timestamp start, Timestamp end) {
+    public static @NotNull List<LogEntry> getLogsBetween(QueryUser user, Timestamp start, Timestamp end) {
         String sql = "SELECT * FROM user_logs WHERE time BETWEEN ? AND ?";
-        return query(sql, start, end);
+        return query(user, sql, start, end);
     }
 
-    public static @NotNull List<LogEntry> getLogsByAction(String action) {
+    public static @NotNull List<LogEntry> getLogsByAction(QueryUser user, String action) {
         String sql = "SELECT * FROM user_logs WHERE action = ?";
-        return query(sql, action);
+        return query(user, sql, action);
     }
 
-    public static @NotNull List<LogEntry> getLogsByLocation(String location) {
+    public static @NotNull List<LogEntry> getLogsByLocation(QueryUser user, String location) {
         String sql = "SELECT * FROM user_logs WHERE location = ?";
-        return query(sql, location);
+        return query(user, sql, location);
     }
 
-    public static @NotNull List<LogEntry> getLogsBySlimefunId(String slimefunId) {
+    public static @NotNull List<LogEntry> getLogsBySlimefunId(QueryUser user, String slimefunId) {
         String sql = "SELECT * FROM user_logs WHERE slimefun_id = ?";
-        return query(sql, slimefunId);
+        return query(user, sql, slimefunId);
     }
 
-    public static @NotNull List<LogEntry> getAllLogs() {
+    public static @NotNull List<LogEntry> getAllLogs(QueryUser user) {
         String sql = "SELECT * FROM user_logs";
-        return query(sql);
+        return query(user, sql);
     }
 
-    private static @NotNull List<LogEntry> query(String sql, Object @NotNull ... params) {
+    private static @NotNull List<LogEntry> query(QueryUser user, String sql, Object @NotNull ... params) {
+        if (QueryUser.isOutdated(user, THRESHOLD)) {
+            QueryUser.updateLastQueryTime(user);
+        } else {
+            user.sendMessage("You can only query logs once every " + THRESHOLD / 1000 + " seconds.");
+            return new ArrayList<>();
+        }
+
         List<LogEntry> logs = new ArrayList<>();
         try (Connection conn = DatabaseManager.getDataSource().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {

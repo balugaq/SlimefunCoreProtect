@@ -1,7 +1,10 @@
 package com.balugaq.slimefuncoreprotect.core.commands.subcommands;
 
+import com.balugaq.slimefuncoreprotect.api.ConsoleQueryUser;
+import com.balugaq.slimefuncoreprotect.api.QueryUser;
 import com.balugaq.slimefuncoreprotect.api.logs.LogDao;
 import com.balugaq.slimefuncoreprotect.api.logs.LogEntry;
+import com.balugaq.slimefuncoreprotect.api.utils.Lang;
 import com.balugaq.slimefuncoreprotect.api.utils.TimeUtil;
 import com.balugaq.slimefuncoreprotect.core.commands.ConsoleOnlyCommand;
 import org.bukkit.command.Command;
@@ -12,9 +15,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DeleteCommand extends ConsoleOnlyCommand {
+    private static final Map<ConsoleCommandSender, QueryUser> queryUsers = new HashMap<>();
     public DeleteCommand(@NotNull JavaPlugin plugin) {
         super(plugin);
     }
@@ -40,16 +46,21 @@ public class DeleteCommand extends ConsoleOnlyCommand {
     @Override
     public boolean onCommand(@NotNull ConsoleCommandSender console, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
         if (args.length < 2) {
-            console.sendMessage("Usage: /slimefun delete time:<time>");
-            console.sendMessage("Delete all logs older than <time>");
+            console.sendMessage(Lang.getMessage("commands.delete.usage"));
+            console.sendMessage(Lang.getMessage("commands.delete.description"));
             return true;
         }
 
         String time = args[1];
         Timestamp timestamp = TimeUtil.parseTime(time);
-        List<LogEntry> logs = LogDao.getLogsBetween(Timestamp.valueOf("1970-01-01 00:00:00.000"), timestamp);
+
+        if (!queryUsers.containsKey(console)) {
+            queryUsers.put(console, new ConsoleQueryUser(console));
+        }
+
+        List<LogEntry> logs = LogDao.getLogsBetween(queryUsers.get(console), Timestamp.valueOf("1970-01-01 00:00:00.000"), timestamp);
         if (logs.isEmpty()) {
-            console.sendMessage("No logs found before time: " + time);
+            console.sendMessage(Lang.getMessage("commands.delete.no-logs", "time", time));
             return true;
         }
 
@@ -57,10 +68,10 @@ public class DeleteCommand extends ConsoleOnlyCommand {
             for (LogEntry log : logs) {
                 LogDao.deleteLog(log.getPlayer(), log.getTime(), log.getAction(), log.getPlayer(), log.getSlimefunId());
             }
-            console.sendMessage("Deleted " + logs.size() + " logs older than " + time);
+            console.sendMessage(Lang.getMessage("commands.delete.success", "count", logs.size(), "time", time));
         } else {
-            console.sendMessage("Are you sure you want to delete " + logs.size() + " logs older than " + time + "? (It cannot be undone!!!)");
-            console.sendMessage("Type /slimefun delete time:" + time + " confirm to confirm deletion.");
+            console.sendMessage(Lang.getMessage("commands.delete.confirm1", "count", logs.size(), "time", time));
+            console.sendMessage(Lang.getMessage("commands.delete.confirm2"));
         }
 
         return true;

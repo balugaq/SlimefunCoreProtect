@@ -11,16 +11,48 @@ messages:
       help: "&f/slimefuncoreprotect help &7- &f显示帮助菜单."
       reload: "&f/slimefuncoreprotect reload &7- &f重新加载插件."
       version: "&f/slimefuncoreprotect version &7- &f显示插件版本."
+      inspect: "&f/slimefuncoreprotect inspect &7- &f开始检查日志."
+      lookup: "&f/slimefuncoreprotect lookup &7- &f查找日志."
+      delete: "&f/slimefuncoreprotect delete time:<time> &7- &f删除日志."
+      page: "&f/slimefuncoreprotect page <page> &7- &f显示指定页码的日志."
     reload:
       success: "&a插件已重新加载."
     version:
+      # {build_station} = build station name
       # {version} = plugin version
-      success: "&a插件版本: &f{version}"
-    id:
-      # {id} = item ID
-      success: "&a物品 ID: &f{id}"
+      success: "&a插件版本: &e{build_station} - &f{version}"
+    inspect:
+      start: "&a已开始检查日志."
+      stop: "&c已停止检查日志."
+    lookup:
+      # {section} = the section of the log to lookup
+      no-action-specified: "你必须指定一个 action 来使用 {section} 部分."
+      # {section} = the section of the log to lookup
+      # {action} = the action to perform on the section
+      not-allowed-action: "{section} 选项不能通过 {action} 操作!"
+      not-player-for-radius-section: "仅玩家能使用 radius 选项!"
+      no-logs-found: "没有找到任何日志!"
+    page:
+      page-number-required: "页码参数不能为空!"
+      # {page} = the page number entered by the user
+      invalid-page-number: "无效的页码: {page}"
+      no-pages-found: "没有找到任何页面!"
+    delete:
+      usage: "语法: /slimefun delete time:<time>"
+      description: "删除所有早于 <time> 的日志."
+      # {time} = the argument passed to the command
+      no-logs: "没有找到早于 {time} 的日志."
+      # {size} = number of logs deleted
+      # {time} = the argument passed to the command
+      success: "删除了 {count} 个时间早于 {time} 的日志."
+      # {size} = number of logs deleted
+      # {time} = the argument passed to the command
+      confirm1: "你确定要删除 {count} 个日志？(不可恢复!!!)"
+      # {time} = the argument passed to the command
+      confirm2: "输入 /slimefun delete time:{time} confirm 以确认删除."
   load:
-    failed-auto-update: "&c自动更新失败: {message}" # {message} = error message
+    # {message} = error message
+    failed-auto-update: "&c自动更新失败: {message}"
     # {id} = item ID
     added-accelerates: "已加速 {id}"
     no-configured-accelerates: "你还没有开始配置插件!"

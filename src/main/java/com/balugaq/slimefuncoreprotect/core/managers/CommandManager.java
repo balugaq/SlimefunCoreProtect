@@ -193,11 +193,13 @@ public class CommandManager implements TabExecutor {
             return entries;
         }
 
-        int start = (page - 1) * maxContentPerPage;
-        int end = start + maxContentPerPage;
+        int end = page * maxContentPerPage;
         if (end > entries.size()) {
             end = entries.size();
         }
+
+        int start = Math.max(0, end - maxContentPerPage);
+
         return entries.subList(start, end);
     }
 
@@ -279,9 +281,6 @@ public class CommandManager implements TabExecutor {
 
     public static void sendPageSwitch(@NotNull CommandSender sender, @NotNull List<LogEntry> entries, @Nullable String command) {
         sender.spigot().sendMessage(formatMessage("&a第 " + getCurrentPage(sender) + " / " + getMaxPage(entries) + " 页." + EMPTY_PLACEHOLDER + " <hover><d>&b<上一页></d><h>&b<上一页></h></hover><click><a>run_command</a><v>/sco page " + Math.max(1, getCurrentPage(sender) - 1) + "</v></click> <hover><d>&b<下一页></d><h>&b<下一页></h></hover><click><a>run_command</a><v>/sco page " + (Math.min(getCurrentPage(sender) + 1, getMaxPage(entries))) + "</v></click>"));
-        if (command != null) {
-            sender.sendMessage(command);
-        }
     }
 
     public void setup() {

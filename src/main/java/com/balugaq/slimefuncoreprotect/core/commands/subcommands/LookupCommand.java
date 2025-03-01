@@ -1,9 +1,11 @@
 package com.balugaq.slimefuncoreprotect.core.commands.subcommands;
 
+import com.balugaq.slimefuncoreprotect.api.QueryUser;
 import com.balugaq.slimefuncoreprotect.api.enums.Action;
 import com.balugaq.slimefuncoreprotect.api.logs.LogDao;
 import com.balugaq.slimefuncoreprotect.api.logs.LogEntry;
 import com.balugaq.slimefuncoreprotect.api.utils.Debug;
+import com.balugaq.slimefuncoreprotect.api.utils.Lang;
 import com.balugaq.slimefuncoreprotect.api.utils.NotHumanUsers;
 import com.balugaq.slimefuncoreprotect.core.commands.SubCommand;
 import com.balugaq.slimefuncoreprotect.core.listeners.MenuListener;
@@ -32,6 +34,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class LookupCommand extends SubCommand {
+    private static final Map<CommandSender, QueryUser> queryUsers = new HashMap<>();
     public static final Set<String> SLIMEFUN_ITEM_IDS = new HashSet<>();
     public static final Set<String> SECTIONS = new HashSet<>();
     public static final Map<String, List<Action>> UNCOMMON_SECTIONS = new HashMap<>();
@@ -92,99 +95,104 @@ public class LookupCommand extends SubCommand {
                 if (arg.startsWith(section)) {
                     List<Action> allowedActions = UNCOMMON_SECTIONS.get(section);
                     if (action == null) {
-                        sender.sendMessage("You must specify an action before using " + section + " section.");
+                        sender.sendMessage(Lang.getMessage("no-action-specified", "section", section));
                         return false;
                     } else {
                         if (!allowedActions.contains(action)) {
-                            sender.sendMessage(section + " section is not allowed for " + action.getKey() + " action.");
+                            sender.sendMessage(Lang.getMessage("not-allowed-action", "section", section, "action", CommandManager.humanizeAction(action)));
                             return false;
                         }
 
-                        if (section.equals("cursor:")) {
-                            String value = arg.replace(section, "").trim();
-                            for (LogEntry entry : entries) {
-                                if (entry.getOtherData() == null) {
-                                    removes.add(entry);
-                                    continue;
-                                }
-
-                                MenuListener.ClickEntry clickEntry = MenuListener.ClickEntry.fromString(entry.getOtherData());
-                                if (clickEntry == null) {
-                                    MenuListener.DragEntry dragEntry = MenuListener.DragEntry.fromString(entry.getOtherData());
-                                    if (dragEntry == null) {
+                        switch (section) {
+                            case "cursor:" -> {
+                                String value = arg.replace(section, "").trim();
+                                for (LogEntry entry : entries) {
+                                    if (entry.getOtherData() == null) {
                                         removes.add(entry);
                                         continue;
                                     }
 
-                                    if (!dragEntry.getCursor().contains(value)) {
+                                    MenuListener.ClickEntry clickEntry = MenuListener.ClickEntry.fromString(entry.getOtherData());
+                                    if (clickEntry == null) {
+                                        MenuListener.DragEntry dragEntry = MenuListener.DragEntry.fromString(entry.getOtherData());
+                                        if (dragEntry == null) {
+                                            removes.add(entry);
+                                            continue;
+                                        }
+
+                                        if (!dragEntry.getCursor().contains(value)) {
+                                            removes.add(entry);
+                                            continue;
+                                        }
+                                        continue;
+                                    } else {
+                                        if (!clickEntry.getCursor().contains(value)) {
+                                            removes.add(entry);
+                                            continue;
+                                        }
+                                    }
+                                }
+                            }
+                            case "clicked:" -> {
+                                String value = arg.replace(section, "").trim();
+                                for (LogEntry entry : entries) {
+                                    if (entry.getOtherData() == null) {
                                         removes.add(entry);
                                         continue;
                                     }
-                                    continue;
-                                } else {
-                                    if (!clickEntry.getCursor().contains(value)) {
+
+                                    MenuListener.ClickEntry clickEntry = MenuListener.ClickEntry.fromString(entry.getOtherData());
+                                    if (clickEntry == null) {
+                                        removes.add(entry);
+                                        continue;
+                                    }
+
+                                    if (!clickEntry.getClicked().contains(value)) {
                                         removes.add(entry);
                                         continue;
                                     }
                                 }
                             }
-                        } else if (section.equals("clicked:")) {
-                            String value = arg.replace(section, "").trim();
-                            for (LogEntry entry : entries) {
-                                if (entry.getOtherData() == null) {
-                                    removes.add(entry);
-                                    continue;
-                                }
+                            case "iaction:" -> {
+                                String value = arg.replace(section, "").trim();
+                                for (LogEntry entry : entries) {
+                                    if (entry.getOtherData() == null) {
+                                        removes.add(entry);
+                                        continue;
+                                    }
 
-                                MenuListener.ClickEntry clickEntry = MenuListener.ClickEntry.fromString(entry.getOtherData());
-                                if (clickEntry == null) {
-                                    removes.add(entry);
-                                    continue;
-                                }
+                                    PlayerListener.ActionEntry actionEntry = PlayerListener.ActionEntry.fromString(entry.getOtherData());
+                                    if (actionEntry == null) {
+                                        removes.add(entry);
+                                        continue;
+                                    }
 
-                                if (!clickEntry.getClicked().contains(value)) {
-                                    removes.add(entry);
-                                    continue;
+                                    if (!actionEntry.getAction().name().contains(value)) {
+                                        removes.add(entry);
+                                        continue;
+                                    }
                                 }
                             }
-                        } else if (section.equals("iaction:")) {
-                            String value = arg.replace(section, "").trim();
-                            for (LogEntry entry : entries) {
-                                if (entry.getOtherData() == null) {
-                                    removes.add(entry);
-                                    continue;
+                            case "radius:" -> {
+                                if (!(sender instanceof Player player)) {
+                                    sender.sendMessage(Lang.getMessage("not-player-for-radius-section"));
+                                    return false;
                                 }
+                                Location center = player.getLocation();
+                                World world = center.getWorld();
+                                String value = arg.replace(section, "").trim();
+                                double radius = Double.parseDouble(value);
+                                for (LogEntry entry : entries) {
+                                    Location location = entry.getLocation();
+                                    if (world != location.getWorld()) {
+                                        removes.add(entry);
+                                        continue;
+                                    }
 
-                                PlayerListener.ActionEntry actionEntry = PlayerListener.ActionEntry.fromString(entry.getOtherData());
-                                if (actionEntry == null) {
-                                    removes.add(entry);
-                                    continue;
-                                }
-
-                                if (!actionEntry.getAction().name().contains(value)) {
-                                    removes.add(entry);
-                                    continue;
-                                }
-                            }
-                        } else if (section.equals("radius:")) {
-                            if (!(sender instanceof Player player)) {
-                                sender.sendMessage("You must be a player to use radius section.");
-                                return false;
-                            }
-                            Location center = player.getLocation();
-                            World world = center.getWorld();
-                            String value = arg.replace(section, "").trim();
-                            double radius = Double.parseDouble(value);
-                            for (LogEntry entry : entries) {
-                                Location location = entry.getLocation();
-                                if (world != location.getWorld()) {
-                                    removes.add(entry);
-                                    continue;
-                                }
-
-                                if (location.distance(center) > radius) {
-                                    removes.add(entry);
-                                    continue;
+                                    if (location.distance(center) > radius) {
+                                        removes.add(entry);
+                                        continue;
+                                    }
                                 }
                             }
                         }
@@ -224,13 +232,16 @@ public class LookupCommand extends SubCommand {
             Debug.debug("Command arg: " + entry.getKey() + " = " + entry.getValue());
         }
 
-        List<LogEntry> entries = LogDao.getLogs(commandArgs);
+        if (!queryUsers.containsKey(sender)) {
+            queryUsers.put(sender, QueryUser.create(sender));
+        }
+        List<LogEntry> entries = LogDao.getLogs(queryUsers.get(sender), commandArgs);
         if (entries.isEmpty()) {
-            sender.sendMessage("No entries found.");
+            sender.sendMessage(Lang.getMessage("no-logs-found"));
             return true;
         }
 
-        if (args.length == 0) {
+        if (args.length == 1) {
             args = new String[]{"radius:10"};
         }
 

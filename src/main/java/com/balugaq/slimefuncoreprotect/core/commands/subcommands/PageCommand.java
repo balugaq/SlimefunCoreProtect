@@ -34,7 +34,7 @@ public class PageCommand extends SubCommand {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
         if (args.length < 2) {
-            sender.sendMessage(Lang.getMessage("invalid_page_number"));
+            sender.sendMessage(Lang.getMessage("commands.page.page-number-required"));
             return false;
         }
 
@@ -42,13 +42,13 @@ public class PageCommand extends SubCommand {
         try {
             page = Integer.parseInt(args[1]);
         } catch (NumberFormatException e) {
-            sender.sendMessage(Lang.getMessage("invalid_page_number"));
+            sender.sendMessage(Lang.getMessage("commands.page.invalid-page-number", "page", args[1]));
             return false;
         }
 
         Map<CommandSender, Integer> pages = CommandManager.getPages();
         if (!pages.containsKey(sender)) {
-            sender.sendMessage(Lang.getMessage("no_pages_found"));
+            sender.sendMessage(Lang.getMessage("commands.page.no-pages-found"));
             return false;
         }
 

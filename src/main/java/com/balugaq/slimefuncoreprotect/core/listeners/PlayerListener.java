@@ -8,6 +8,7 @@ import com.balugaq.slimefuncoreprotect.api.utils.TimeUtil;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -62,14 +63,26 @@ public class PlayerListener implements Listener {
         if (item != null) {
             Debug.debug("Insert player interact item log");
             Player player = event.getPlayer();
-            LogDao.insertLog(
-                    player.getName(),
-                    TimeUtil.now(),
-                    Action.INTERACT_ITEM.getKey(),
-                    LogEntry.getStringBlockLocation(player.getLocation()),
-                    item.getId(),
-                    getActionString(event)
-            );
+            Block block = event.getClickedBlock();
+            if (block == null) {
+                LogDao.insertLog(
+                        player.getName(),
+                        TimeUtil.now(),
+                        Action.INTERACT_ITEM.getKey(),
+                        LogEntry.getStringLocation(player.getLocation()),
+                        item.getId(),
+                        getActionString(event)
+                );
+            } else {
+                LogDao.insertLog(
+                        player.getName(),
+                        TimeUtil.now(),
+                        Action.INTERACT_ITEM.getKey(),
+                        LogEntry.getStringBlockLocation(block.getRelative(event.getBlockFace()).getLocation()),
+                        item.getId(),
+                        getActionString(event)
+                );
+            }
         }
     }
 
