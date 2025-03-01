@@ -5,7 +5,42 @@ messages:
     no-permission: "你没有权限使用这个指令!"
     player-only: "这个指令只能由玩家使用!"
     console-only: "这个指令只能由控制台使用!"
-    click-to-copy: "点击复制"
+    # {text} = the text that could not be deserialized
+    unable-to-deserialize: "&c解析错误: {text}"
+    # {action} = the action that could not be deserialized
+    unknown-click-action: "&c未知点击类型: {action}"
+    lookups:
+      # {delay} = the time of the action happened
+      # {player} = the user who did the action // may "#BlockPlacer" or "#ExplosiveTool" or player name
+      # {action} = the action performed by the user // may be "+item" or "+block"
+      common: "&e{delay}&7 * <hover><d>&b{player}</d><h>&d点击复制: {player}</h></hover><click><a>copy_to_clipboard</a><v>{player}</v></click>&7 * <hover><d>&f{action}</d><h>&d点击复制: {action}</h></hover><click><a>copy_to_clipboard</a><v>{action}</v></click>"
+      # {spaces} = the " " to align the text
+      # {cursor} = the cursor item name
+      # {clicked} = the clicked item name
+      # {slot} = the slot number
+      # {click_type} = the click type // may be "LEFT" or "RIGHT" or "MIDDLE"
+      menu-click1: "&7 * {spaces}<hover><d>&6Cursor: {cursor} &d[点击复制]</d><h>&d[点击复制]</h></hover><click><a>copy_to_clipboard</a><v>{cursor}</v></click>&7 * <hover><d>&3Slot: {slot} &d[点击复制]</d><h>&d[点击复制]</h></hover><click><a>copy_to_clipboard</a><v>{slot}</v></click>"
+      # {spaces} = the " " to align the text
+      # {cursor} = the cursor item name
+      # {clicked} = the clicked item name
+      # {slot} = the slot number
+      # {click_type} = the click type // may be "LEFT" or "RIGHT" or "MIDDLE"
+      menu-click2: "&7 * {spaces}<hover><d>&2Clicked: {clicked} &d[点击复制]</d><h>&d[点击复制]</h></hover><click><a>copy_to_clipboard</a><v>{clicked}</v></click>"
+      # {spaces} = the " " to align the text
+      # {cursor} = the cursor item name
+      # {slots} = the slots that were dragged
+      # {drag_type} = the drag type // may be "SINGLE" or "EVEN"
+      menu-drag: "&7 * {spaces}<hover><d>&6Cursor: {cursor} &d[点击复制]</d><h>&d[点击复制]</h></hover><click><a>copy_to_clipboard</a><v>{cursor}</v></click>&7 * <hover><d>&3Slots: {slots} &d[点击复制]</d><h>&d[点击复制]</h></hover><click><a>copy_to_clipboard</a><v>{slots}</v></click>"
+      # {spaces} = the " " to align the text
+      # {x} = the x coordinate of the location
+      # {y} = the y coordinate of the location
+      # {z} = the z coordinate of the location
+      # {world} = the world name
+      location: "&7 * <hover><d>{spaces}&7&o(x{x}/y{y}/z{z}/{world})</d><h>&b点击传送到该位置</h></hover><click><a>run_command</a><v>/minecraft:tp {x} {y} {z}</v></click>"
+      # {spaces} = the " " to align the text
+      # {name} = the Slimefun item name
+      # {id} = the Slimefun item ID
+      slimefun-id: "&7 * <hover><d>{spaces}&a&o物品: {name}</d><h>&d点击复制: {id}</h></hover><click><a>copy_to_clipboard</a><v>{id}</v></click>"
     help:
       header: "&b[Help] &f帮助."
       help: "&f/slimefuncoreprotect help &7- &f显示帮助菜单."

@@ -14,6 +14,7 @@ import com.balugaq.slimefuncoreprotect.core.commands.subcommands.PageCommand;
 import com.balugaq.slimefuncoreprotect.core.commands.subcommands.ReloadCommand;
 import com.balugaq.slimefuncoreprotect.core.commands.subcommands.VersionCommand;
 import com.balugaq.slimefuncoreprotect.core.listeners.MenuListener;
+import com.balugaq.slimefuncoreprotect.implementation.SlimefunCoreProtect;
 import com.google.common.base.Preconditions;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import lombok.Getter;
@@ -44,17 +45,14 @@ import java.util.regex.Pattern;
 @Getter
 public class CommandManager implements TabExecutor {
     public static final String EMPTY_PLACEHOLDER = "<hover><d></d><h></h></hover>";
-    private static final Pattern pattern = Pattern.compile("(.*?)(<hover>|<click>$)");
+    public static final Pattern CLICK_TAG_PATTERN = Pattern.compile("<a>(.*?)</a><v>(.*?)</v>", Pattern.DOTALL);
     @Getter
     private static final Map<CommandSender, List<LogEntry>> lastLookup = new HashMap<>();
     @Getter
     private static final Map<CommandSender, Integer> pages = new HashMap<>();
     private static final String ROOT_COMMAND = "slimefuncoreprotect";
-    private static final int maxContentPerPage = 5; // todo: add to config
-    private static final Pattern TAG_PATTERN = Pattern.compile(
-            "(.*?)(<(hover|click)>(.*?)</\\3>)",
-            Pattern.DOTALL
-    );
+    private static final int MAX_CONTENT_PER_PAGE = SlimefunCoreProtect.getInstance().getConfigManager().getMaxContentPerPage();
+    private static final Pattern TAG_PATTERN = Pattern.compile("(.*?)(<(hover|click)>(.*?)</\\3>)", Pattern.DOTALL);
     private final @NotNull JavaPlugin plugin;
     private final List<SubCommand> subCommands = new ArrayList<>();
     private final @NotNull SubCommand defaultCommand;
@@ -71,7 +69,11 @@ public class CommandManager implements TabExecutor {
         return humanizeAction(Action.of(actionStr));
     }
 
-    public static @NotNull String humanizeAction(@NotNull Action action) {
+    public static @NotNull String humanizeAction(@Nullable Action action) {
+        if (action == null) {
+            return "unknown";
+        }
+
         return switch (action) {
             case BLOCK_PLACE -> "&a&l+block&r";
             case BLOCK_BREAK -> "&c&l-block&r";
@@ -111,13 +113,11 @@ public class CommandManager implements TabExecutor {
             Location location = entry.getLocation();
             String delay = TimeUtil.getDelay(entry.getTime());
             String spaces = " ".repeat(delay.length() + 3);
-            sender.spigot().sendMessage(formatMessage(
-                    "&e" + delay +
-                            "&7 * <hover><d>&b" + entry.getPlayer() + "</d><h>&d点击复制: " + entry.getPlayer() + "</h></hover>" +
-                            "<click><a>copy_to_clipboard</a><v>" + entry.getPlayer() + "</v></click>" +
-                            "&7 * <hover><d>&f" + humanizeAction(entry.getAction()) + "</d><h>&d点击复制: " + humanizeAction(entry.getAction()) + "</h></hover>" +
-                            "<click><a>copy_to_clipboard</a><v>" + humanizeAction(entry.getAction()) + "</v></click>"
-            ));
+            sender.spigot().sendMessage(formatMessage(Lang.getMessage("commands.lookups.common",
+                    "delay", delay,
+                    "player", entry.getPlayer(),
+                    "action", humanizeAction(entry.getAction())
+            )));
 
             Action action = Action.of(entry.getAction());
             if (action == Action.MENU_CLICK) {
@@ -125,18 +125,22 @@ public class CommandManager implements TabExecutor {
                 MenuListener.ClickEntry clickEntry = MenuListener.ClickEntry.fromString(otherData);
                 if (clickEntry != null) {
                     newline();
-                    sender.spigot().sendMessage(formatMessage(
-                        "&7 * " + spaces + "<hover><d>&6Cursor: " + clickEntry.getCursor() + " &d[点击复制]</d><h>&d[点击复制]</h></hover>" +
-                        "<click><a>copy_to_clipboard</a><v>" + clickEntry.getCursor() + "</v></click>" +
-                        "&7 * <hover><d>&3Slot: " + clickEntry.getSlot() + " &d[点击复制]</d><h>&d[点击复制]</h></hover>" +
-                        "<click><a>copy_to_clipboard</a><v>" + clickEntry.getSlot() + "</v></click>"
-                    ));
+                    sender.spigot().sendMessage(formatMessage(Lang.getMessage("commands.lookups.menu-click1",
+                            "spaces", spaces,
+                            "cursor", clickEntry.getCursor(),
+                            "clicked", clickEntry.getClicked(),
+                            "slot", clickEntry.getSlot(),
+                            "click_type", clickEntry.getClickType().name()
+                    )));
 
                     newline();
-                    sender.spigot().sendMessage(formatMessage(
-                        "&7 * " + spaces + "<hover><d>&2Clicked: " + clickEntry.getClicked() + " &d[点击复制]</d><h>&d[点击复制]</h></hover>" +
-                        "<click><a>copy_to_clipboard</a><v>" + clickEntry.getClicked() + "</v></click>"
-                    ));
+                    sender.spigot().sendMessage(formatMessage(Lang.getMessage("commands.lookups.menu-click2",
+                            "spaces", spaces,
+                            "cursor", clickEntry.getCursor(),
+                            "clicked", clickEntry.getClicked(),
+                            "slot", clickEntry.getSlot(),
+                            "click_type", clickEntry.getClickType().name()
+                    )));
                 }
             } else if (action == Action.MENU_DRAG) {
                 String otherData = entry.getOtherData();
@@ -144,28 +148,32 @@ public class CommandManager implements TabExecutor {
                 if (dragEntry != null) {
                     List<Integer> slots = dragEntry.getSlots().stream().sorted().toList();
                     newline();
-                    sender.spigot().sendMessage(formatMessage(
-                            "&7 * " + spaces + "<hover><d>&6Cursor: " + dragEntry.getCursor() + " &d[点击复制]</d><h>&d[点击复制]</h></hover>" +
-                            "<click><a>copy_to_clipboard</a><v>" + dragEntry.getCursor() + "</v></click>" +
-                            "&7 * <hover><d>&3Slots: " + slots + " &d[点击复制]</d><h>&d[点击复制]</h></hover>" +
-                            "<click><a>copy_to_clipboard</a><v>" + slots + "</v></click>"
-                    ));
+                    sender.spigot().sendMessage(formatMessage(Lang.getMessage("commands.lookups.menu-drag",
+                            "spaces", spaces,
+                            "cursor", dragEntry.getCursor(),
+                            "slots", slots.toString(),
+                            "drag_type", dragEntry.getDragType().name()
+                    )));
                 }
             }
 
             if (location != null) {
                 newline();
-                sender.spigot().sendMessage(formatMessage(
-                        "&7 * <hover><d>" + spaces + "&7&o(x" + location.getBlockX() + "/y" + location.getBlockY() + "/z" + location.getBlockZ() + "/" + location.getWorld().getName() + ")" + "</d><h>&b点击传送到该位置</h></hover>" +
-                                "<click>=<a>run_command</a><v>/minecraft:tp " + location.getBlockX() + " " + location.getBlockY() + " " + location.getBlockZ() + "</v></click>"
-                ));
-
-                newline();
-                sender.spigot().sendMessage(formatMessage(
-                        "&7 * <hover><d>" + spaces + "&a&o物品: " + getName(entry.getSlimefunId()) + "</d><h>&d点击复制: " + entry.getSlimefunId() + "</h></hover>" +
-                                "<click><a>copy_to_clipboard</a><v>" + entry.getSlimefunId() + "</v></click>"
-                ));
+                sender.spigot().sendMessage(formatMessage(Lang.getMessage("commands.lookups.location",
+                        "spaces", spaces,
+                        "x", location.getBlockX(),
+                        "y", location.getBlockY(),
+                        "z", location.getBlockZ(),
+                        "world", location.getWorld().getName()
+                )));
             }
+
+            newline();
+            sender.spigot().sendMessage(formatMessage(Lang.getMessage("commands.lookups.slimefun-id",
+                    "spaces", spaces,
+                    "name", getName(entry.getSlimefunId()),
+                    "id", entry.getSlimefunId()
+            )));
         }
 
         if (!splitted.isEmpty()) {
@@ -193,12 +201,12 @@ public class CommandManager implements TabExecutor {
             return entries;
         }
 
-        int end = page * maxContentPerPage;
+        int end = page * MAX_CONTENT_PER_PAGE;
         if (end > entries.size()) {
             end = entries.size();
         }
 
-        int start = Math.max(0, end - maxContentPerPage);
+        int start = Math.max(0, end - MAX_CONTENT_PER_PAGE);
 
         return entries.subList(start, end);
     }
@@ -212,7 +220,7 @@ public class CommandManager implements TabExecutor {
         if (size == 0) {
             return 1;
         }
-        return (size + maxContentPerPage - 1) / maxContentPerPage;
+        return (size + MAX_CONTENT_PER_PAGE - 1) / MAX_CONTENT_PER_PAGE;
     }
 
     public static BaseComponent @NotNull [] formatMessage(@NotNull String message) {
@@ -230,7 +238,8 @@ public class CommandManager implements TabExecutor {
                     builder.append(format(normalText));
                 }
 
-                String fullTag = matcher.group(2);
+                // Unused
+                // String fullTag = matcher.group(2);
                 String tagType = matcher.group(3);
                 String tagContent = matcher.group(4);
 
@@ -243,14 +252,15 @@ public class CommandManager implements TabExecutor {
                 message = message.substring(matcher.end(2));
             }
         } catch (Exception e) {
-            builder.append(format("&c解析错误: " + message));
+            builder.append(Lang.getMessage("commands.unable-to-deserialize", "text", message));
             e.printStackTrace();
         }
         return builder.create();
     }
 
+    public static final Pattern HOVER_TAG_PATTERN = Pattern.compile("<d>(.*?)</d><h>(.*?)</h>", Pattern.DOTALL);
     private static void processHoverTag(@NotNull ComponentBuilder builder, @NotNull String content) {
-        Matcher m = Pattern.compile("<d>(.*?)</d><h>(.*?)</h>", Pattern.DOTALL).matcher(content);
+        Matcher m = HOVER_TAG_PATTERN.matcher(content);
         if (m.find()) {
             BaseComponent[] display = TextComponent.fromLegacyText(format(m.group(1)));
             BaseComponent[] hover = TextComponent.fromLegacyText(format(m.group(2)));
@@ -260,7 +270,7 @@ public class CommandManager implements TabExecutor {
     }
 
     private static void processClickTag(@NotNull ComponentBuilder builder, @NotNull String content) {
-        Matcher m = Pattern.compile("<a>(.*?)</a><v>(.*?)</v>", Pattern.DOTALL).matcher(content);
+        Matcher m = CLICK_TAG_PATTERN.matcher(content);
         if (m.find()) {
             String action = m.group(1).trim().toUpperCase();
             String value = m.group(2).trim();
@@ -269,7 +279,7 @@ public class CommandManager implements TabExecutor {
                 ClickEvent.Action clickAction = ClickEvent.Action.valueOf(action);
                 builder.event(new ClickEvent(clickAction, value));
             } catch (IllegalArgumentException e) {
-                builder.append(format("&c未知点击类型: " + action));
+                builder.append(Lang.getMessage("commands.unknown-click-action", "action", action));
                 e.printStackTrace();
             }
         }

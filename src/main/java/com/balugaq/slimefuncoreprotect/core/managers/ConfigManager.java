@@ -38,6 +38,8 @@ public class ConfigManager {
     private ConfigVersion CONFIG_VERSION;
     @Since(ConfigVersion.C_20250226_2)
     private DatabaseType DATABASE_TYPE;
+    @Since(ConfigVersion.C_20250301_1)
+    private final int MAX_CONTENT_PER_PAGE;
 
     public ConfigManager(@NotNull JavaPlugin plugin) {
         this.plugin = plugin;
@@ -67,6 +69,8 @@ public class ConfigManager {
             plugin.getLogger().warning("Invalid database.type value: " + dataBaseTypeStr + ", using default value: sqlite");
             this.DATABASE_TYPE = DatabaseType.SQLITE;
         }
+
+        this.MAX_CONTENT_PER_PAGE = config.getInt("max-content-per-page", 5);
     }
 
     private void setupDefaultConfig() {
@@ -131,28 +135,39 @@ public class ConfigManager {
         }
     }
 
+    @Since(ConfigVersion.C_20250226_1)
     public boolean isAutoUpdate() {
         return AUTO_UPDATE;
     }
 
+    @Since(ConfigVersion.C_20250226_1)
     public boolean isDebug() {
         return DEBUG;
     }
 
+    @Since(ConfigVersion.C_20250226_1)
     public @NotNull String getLanguage() {
         return LANGUAGE;
     }
 
+    @Since(ConfigVersion.C_20250226_1)
     public BuildStation getBuildStation() {
         return BUILD_STATION;
     }
 
+    @Since(ConfigVersion.C_20250226_1)
     public ConfigVersion getConfigVersion() {
         return CONFIG_VERSION;
     }
 
+    @Since(ConfigVersion.C_20250226_2)
     public DatabaseType getDatabaseType() {
         return DATABASE_TYPE;
+    }
+
+    @Since(ConfigVersion.C_20250301_1)
+    public int getMaxContentPerPage() {
+        return MAX_CONTENT_PER_PAGE;
     }
 
     public @Nullable String getConfig(@NotNull String path) {

@@ -5,12 +5,15 @@ import com.balugaq.slimefuncoreprotect.api.logs.LogDao;
 import com.balugaq.slimefuncoreprotect.api.logs.LogEntry;
 import com.balugaq.slimefuncoreprotect.api.utils.Debug;
 import com.balugaq.slimefuncoreprotect.api.utils.TimeUtil;
+import com.balugaq.slimefuncoreprotect.implementation.SlimefunCoreProtect;
 import io.github.thebusybiscuit.slimefun4.api.events.SlimefunItemRegistryFinalizedEvent;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.items.ItemUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu;
+import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import org.bukkit.FluidCollisionMode;
@@ -35,6 +38,7 @@ import java.util.UUID;
 public class MenuListener implements Listener {
     public static final String UNDEFINED = "undefined";
     private static final Set<UUID> opening = new HashSet<>();
+    private static final boolean isCNSlimefun = SlimefunCoreProtect.getInstance().getIntegrationManager().isCNSlimefun();
 
     public static String getDragString(@NotNull InventoryDragEvent event) {
         return new DragEntry(event.getType(), event.getRawSlots(), ItemUtils.getItemName(event.getWhoClicked().getItemOnCursor())).toString();
@@ -87,32 +91,68 @@ public class MenuListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onMenuClick(@NotNull InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
-        if (event.getInventory().getHolder() instanceof BlockMenu menu) {
-            Debug.debug("Insert menu click log");
-            LogDao.insertLog(
-                    player.getName(),
-                    TimeUtil.now(),
-                    Action.MENU_CLICK.getKey(),
-                    LogEntry.getStringBlockLocation(event.getInventory().getLocation()),
-                    menu.getPreset().getID(),
-                    getClickString(event)
-            );
+        if (opening.contains(player.getUniqueId())) {
+            if (isCNSlimefun) {
+                if (event.getInventory().getHolder() instanceof BlockMenu menu) {
+                    Debug.debug("Insert menu click log");
+                    LogDao.insertLog(
+                            player.getName(),
+                            TimeUtil.now(),
+                            Action.MENU_CLICK.getKey(),
+                            LogEntry.getStringBlockLocation(event.getInventory().getLocation()),
+                            menu.getPreset().getID(),
+                            getClickString(event)
+                    );
+                }
+            } else {
+                Block block = player.getTargetBlockExact(8, FluidCollisionMode.NEVER);
+                SlimefunItem item = BlockStorage.check(block.getLocation());
+                if (item != null) {
+                    Debug.debug("Insert menu click log");
+                    LogDao.insertLog(
+                            player.getName(),
+                            TimeUtil.now(),
+                            Action.MENU_CLICK.getKey(),
+                            LogEntry.getStringBlockLocation(block.getLocation()),
+                            item.getId(),
+                            getClickString(event)
+                    );
+                }
+            }
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onMenuDrag(@NotNull InventoryDragEvent event) {
         Player player = (Player) event.getWhoClicked();
-        if (event.getInventory().getHolder() instanceof BlockMenu menu) {
-            Debug.debug("Insert menu drag log");
-            LogDao.insertLog(
-                    player.getName(),
-                    TimeUtil.now(),
-                    Action.MENU_DRAG.getKey(),
-                    LogEntry.getStringBlockLocation(event.getInventory().getLocation()),
-                    menu.getPreset().getID(),
-                    getDragString(event)
-            );
+        if (opening.contains(player.getUniqueId())) {
+            if (isCNSlimefun) {
+                if (event.getInventory().getHolder() instanceof BlockMenu menu) {
+                    Debug.debug("Insert menu drag log");
+                    LogDao.insertLog(
+                            player.getName(),
+                            TimeUtil.now(),
+                            Action.MENU_DRAG.getKey(),
+                            LogEntry.getStringBlockLocation(event.getInventory().getLocation()),
+                            menu.getPreset().getID(),
+                            getDragString(event)
+                    );
+                }
+            } else {
+                Block block = player.getTargetBlockExact(8, FluidCollisionMode.NEVER);
+                SlimefunItem item = BlockStorage.check(block.getLocation());
+                if (item != null) {
+                    Debug.debug("Insert menu drag log");
+                    LogDao.insertLog(
+                            player.getName(),
+                            TimeUtil.now(),
+                            Action.MENU_DRAG.getKey(),
+                            LogEntry.getStringBlockLocation(block.getLocation()),
+                            item.getId(),
+                            getDragString(event)
+                    );
+                }
+            }
         }
     }
 
