@@ -187,6 +187,11 @@ public class LogDao {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return logs.reversed();
+
+        List<LogEntry> reversedLogs = new ArrayList<>();
+        for (int i = logs.size() - 1; i >= 0; i--) {
+            reversedLogs.add(logs.get(i));
+        }
+        return reversedLogs;
     }
 }
